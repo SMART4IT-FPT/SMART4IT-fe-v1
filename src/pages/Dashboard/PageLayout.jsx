@@ -63,7 +63,7 @@ export default function DashboardPageLayout() {
     getCurrentUserApi({
       user: user,
       onFail: (msg) => {
-        errorNotify({ message: msg });
+        // errorNotify({ message: msg });
         navigate("/login");
       },
       onSuccess: (user) => {

@@ -21,7 +21,7 @@ export default function LoginPage() {
       loginApi({
         accessToken: tokenResponse.access_token,
         onFail: (msg) => {
-          errorNofify({ message: msg });
+          // errorNofify({ message: msg });
         },
         onSuccess: () => {
           navigate("/dashboard");
