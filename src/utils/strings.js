@@ -38,7 +38,7 @@ export const languageOptions = [
 ];
 
 const appStrings = {
-  appName: "CVEZ",
+  appName: "SMART4IT",
   language: getLanguageStrings(localStorage.getItem("language") || "en"),
 };
 

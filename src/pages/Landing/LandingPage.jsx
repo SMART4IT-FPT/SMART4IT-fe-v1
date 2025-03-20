@@ -33,7 +33,7 @@ const socials = [
   { icon: IconBrandGithub },
 ];
 const supportItems = ["Help Center", "FAQ", "Bug report", "Contact Us"];
-const names = ["CVez", "Forum", "Documentation"];
+const names = ["SMART4IT", "Forum", "Documentation"];
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -229,7 +229,7 @@ export default function LandingPage() {
           <Title order={1}>About us</Title>
           <Title order={4}>Career Growth Through Strategic Connections</Title>
           <Text size="sm" className={style.text}>
-            At CVEZ, we believe in taking a comprehensive approach to unlocking
+            At SMART4IT, we believe in taking a comprehensive approach to unlocking
             your career potential by connecting you with the right opportunities
             beyond traditional CV submissions.
           </Text>
@@ -240,7 +240,7 @@ export default function LandingPage() {
           </Text>
         </Flex>
       </Flex>
-      {/* Create footer for CVez */}
+      {/* Create footer for SMART4IT */}
       <Box>
         <Divider style={{ marginBottom: "30px", marginTop: "50px" }} />
         <Container>
@@ -272,7 +272,7 @@ export default function LandingPage() {
 
             <Grid.Col span={4}>
               <Title style={{ marginBottom: "5px" }} order={5}>
-                Subscribe to CVEZ newsletter
+                Subscribe to SMART4IT newsletter
               </Title>
               <Text size="sm" c="dimmed">
                 Get the latest news and updates
@@ -311,10 +311,10 @@ export default function LandingPage() {
           />
           <Flex justify="space-between" align="center" style={{ width: "95%" }}>
             <Text style={{ marginBottom: "20px" }} size="sm" c="dimmed">
-              © 2024 CVEZ. All rights reserved
+              © 2024 SMART4IT. All rights reserved
             </Text>
             <Text style={{ marginBottom: "20px" }} size="sm" c="dimmed">
-              Made with 💗 by CVEZ
+              Made with 💗 by SMART4IT
             </Text>
           </Flex>
         </Container>

@@ -1,6 +1,6 @@
 const vietnamese = {
   auth: {
-    login: "Đăng nhập vào CVEZ",
+    login: "Đăng nhập vào SMART4IT",
     logout: "Đăng xuất",
     noLogin: "Bạn chưa đăng nhập",
   },
@@ -67,9 +67,9 @@ const vietnamese = {
   },
   insight: {
     title: "Phân tích",
-    heading: "Phân Tích chuyên sâu CVEZ",
+    heading: "Phân Tích chuyên sâu SMART4IT",
     introduction:
-      "CVEZ Insight giúp bạn phân tích chi tiết về vị trí tuyển dụng, về phân phối kỹ năng giữa các điểm số của ứng viên.",
+      "SMART4IT Insight giúp bạn phân tích chi tiết về vị trí tuyển dụng, về phân phối kỹ năng giữa các điểm số của ứng viên.",
     selectPlaceholder: "Chọn vị trí",
     viewInsightBtn: "Xem Phân Tích",
   },
