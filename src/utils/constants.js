@@ -1,8 +1,7 @@
 export const googleClientId =
   "765198139881-0vdveqqf338q0g9nvkclphnockf9f35n.apps.googleusercontent.com";
 
-export const baseUrl = "http://127.0.0.1:8000";
-// export const baseUrl = "http://localhost:8000";
+export const baseUrl = "http://localhost:7860";
 
 export const apiUrls = {
   // Auth
@@ -52,17 +51,6 @@ export const apiUrls = {
   uploadCVPublic: (positionId) => `/api/v1/cv/${positionId}/upload`,
   deleteCV: (projectId, positionId, cvId) =>
     `/api/v1/cv/${projectId}/${positionId}/${cvId}`,
-  // Questions
-  getQuestionBanks: (projectId, positionId) =>
-    `/api/v1/question_bank/${projectId}/${positionId}`,
-  getQuestionBank: (projectId, positionId, bankId) =>
-    `/api/v1/question_bank/${projectId}/${positionId}/${bankId}`,
-  updateQuestionBank: (projectId, positionId, bankId) =>
-    `/api/v1/question_bank/${projectId}/${positionId}/${bankId}`,
-  createQuestionBank: (projectId, positionId) =>
-    `/api/v1/question_bank/${projectId}/${positionId}`,
-  deleteQuestionBank: (projectId, positionId, bankId) =>
-    `/api/v1/question_bank/${projectId}/${positionId}/${bankId}`,
   // Match
   matchCVJD: (projectId, positionId) =>
     `/api/v1/match/match_cv_jd/${projectId}/${positionId}`,

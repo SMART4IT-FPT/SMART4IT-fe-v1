@@ -60,11 +60,6 @@ export default function PositionPageLayout() {
       icon: <IconFileCv size="1rem" />,
       to: `/${projectId}/${positionId}/cv`,
     },
-    {
-      label: appStrings.language.questionBanks.title,
-      icon: <IconQuestionMark size="1rem" />,
-      to: `/${projectId}/${positionId}/questions`,
-    },
   ];
 
   useEffect(() => {
