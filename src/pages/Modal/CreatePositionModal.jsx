@@ -6,12 +6,10 @@ import {
   Flex,
   Group,
   Button,
-  Select,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { IconCalendarEvent } from "@tabler/icons-react";
 import appStrings from "../../utils/strings";
-import criteriaSet from "../../utils/criteria";
 
 import { v4 as uuidv4 } from "uuid";
 import { useRef, useState } from "react";
@@ -20,6 +18,7 @@ import { getAliasByName } from "../../utils/utils";
 import { createPositionApi } from "../../apis/positions";
 import usePositionsState from "../../context/position";
 import useNotification from "../../hooks/useNotification";
+
 
 export default function CreatePositionModal({ title, open, onClose }) {
   const location = useLocation();
@@ -30,11 +29,9 @@ export default function CreatePositionModal({ title, open, onClose }) {
     positionDescription: "",
     startDate: null,
     endDate: null,
-    criteriaSet: criteriaSet[0].criteria,
   });
   const idAlias = useRef(uuidv4());
   const [isLoading, setIsLoading] = useState(false);
-  const [isFirstTimeError, setIsFirstTimeError] = useState(true);
   const setPosition = usePositionsState((state) => state.setPosition);
   const errorNotify = useNotification({ type: "error" });
 
@@ -54,12 +51,7 @@ export default function CreatePositionModal({ title, open, onClose }) {
     setForm({ ...form, endDate: value });
   };
 
-  const handleChangeCriteriaSet = (index) => {
-    setForm({ ...form, criteriaSet: criteriaSet[index].criteria });
-  };
-
   function handleSubmitForm() {
-    setIsFirstTimeError(false);
     if (!form.positionName || !form.startDate || !form.endDate) {
       errorNotify({
         message: appStrings.language.createPosition.requiredErrorMessage,
@@ -74,7 +66,6 @@ export default function CreatePositionModal({ title, open, onClose }) {
       description: form.positionDescription,
       startDate: form.startDate.toISOString(),
       endDate: form.endDate.toISOString(),
-      criteria: form.criteriaSet,
       onFail: (msg) => {
         setIsLoading(false);
         errorNotify({ message: msg });
@@ -96,28 +87,22 @@ export default function CreatePositionModal({ title, open, onClose }) {
       <Group gap="lg">
         <TextInput
           label={appStrings.language.createPosition.nameLabel}
-          placeholder={appStrings.language.createPosition.nameLabel}
+          placeholder={appStrings.language.createPosition.namePlaceholder}
           style={{ width: "100%" }}
           onChange={handleInputChange}
           value={form.positionName}
           required
-          error={
-            isFirstTimeError || form.positionName
-              ? null
-              : appStrings.language.createPosition.fieldRequired
-          }
         />
         <TextInput
           disabled
           label={appStrings.language.createPosition.aliasLabel}
-          placeholder={appStrings.language.createPosition.aliasLabel}
+          placeholder={appStrings.language.createPosition.aliasPlaceholder}
           style={{ width: "100%" }}
           value={getAliasByName(form.positionName, idAlias.current)}
         />
         <Textarea
-          variant="filled"
           label={appStrings.language.createPosition.descriptionLabel}
-          placeholder={appStrings.language.createPosition.descriptionLabel}
+          placeholder={appStrings.language.createPosition.descriptionPlaceholder}
           style={{ width: "100%" }}
           value={form.positionDescription}
           onChange={handleChangeDescription}
@@ -133,11 +118,6 @@ export default function CreatePositionModal({ title, open, onClose }) {
             onChange={handleStartDateChange}
             maxDate={form.endDate}
             required
-            error={
-              isFirstTimeError || form.startDate
-                ? null
-                : appStrings.language.createPosition.fieldRequired
-            }
           />
           <DateInput
             rightSection={<IconCalendarEvent />}
@@ -149,24 +129,8 @@ export default function CreatePositionModal({ title, open, onClose }) {
             onChange={handleEndDateChange}
             minDate={form.startDate}
             required
-            error={
-              isFirstTimeError || form.endDate
-                ? null
-                : appStrings.language.createPosition.fieldRequired
-            }
           />
         </Flex>
-        <Select
-          w="100%"
-          label={appStrings.language.createPosition.criteriaSetLabel}
-          data={criteriaSet.map((criteria, index) => ({
-            value: `${index}`,
-            label: criteria.label,
-          }))}
-          defaultValue="0"
-          allowDeselect={false}
-          onChange={(value) => handleChangeCriteriaSet(parseInt(value))}
-        />
       </Group>
       <Flex justify="flex-end" gap="md" style={{ marginTop: "20px" }}>
         <Button variant="default" onClick={onClose}>
