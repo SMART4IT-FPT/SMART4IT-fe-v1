@@ -54,12 +54,12 @@ export default function JDPage() {
   const [jd, setJD] = useState(null);
 
   function handleSaveJD() {
-    if (!position?.criterias?.length) {
-      errorNotify({
-        message: appStrings.language.jd.noCriteriaError,
-      });
-      return;
-    }
+    // if (!position?.criterias?.length) {
+    //   errorNotify({
+    //     message: appStrings.language.jd.noCriteriaError,
+    //   });
+    //   return;
+    // }
     setIsLoading(true);
     const content = editorController?.getHTML();
     if (content === "<p></p>") {

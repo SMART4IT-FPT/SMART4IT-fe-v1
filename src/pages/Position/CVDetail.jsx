@@ -37,7 +37,6 @@ import {
   getCVKeywordDetailApi,
   summaryAIApi,
 } from "../../apis/cv";
-import { getScoreColor } from "../../utils/utils";
 import FileViewer from "../../components/FileViewer";
 import DetailTable from "../../components/DetailTable";
 
@@ -214,28 +213,6 @@ export default function CVDetailPage() {
           )}
         </Blockquote>
       ) : null}
-      <Flex gap="lg">
-        {cv
-          ? Object.entries(cv.score).map(([key, value]) => (
-              <Flex direction="column" align="center">
-                <RingProgress
-                  label={
-                    <Text>
-                      <Center>{value}%</Center>
-                    </Text>
-                  }
-                  roundCaps
-                  sections={[{ value: value, color: getScoreColor(value) }]}
-                />
-                <Text>
-                  {key === "overall"
-                    ? appStrings.language.cvDetail.overall
-                    : key}
-                </Text>
-              </Flex>
-            ))
-          : null}
-      </Flex>
       <Flex direction="column" align="start" gap="xl" mb="xl">
         {cv
           ? Object.entries(cv.extraction).map(([key, value]) => (

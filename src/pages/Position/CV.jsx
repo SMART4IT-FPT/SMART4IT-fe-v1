@@ -49,7 +49,7 @@ import useCVState from "../../context/cv";
 import useNotification from "../../hooks/useNotification";
 import {
   formatDate,
-  getScoreColor,
+  // getScoreColor,
   getShareUploadUrl,
 } from "../../utils/utils";
 import useInterval from "../../hooks/useInterval";
@@ -66,10 +66,6 @@ const columns = [
     label: appStrings.language.cv.tableUploadDate,
   },
   {
-    key: "score",
-    label: appStrings.language.cv.tableScore,
-  },
-  {
     key: "actions",
     label: appStrings.language.cv.tableAction,
   },
@@ -83,7 +79,6 @@ export default function CVPage() {
   const position = usePositionsState((state) => state.position);
   const cvs = useCVState((state) => state.cvs);
   const setCVs = useCVState((state) => state.setCVs);
-  const setCVScores = useCVState((state) => state.setCVScores);
   const uploadFiles = useCVState((state) => state.uploadFiles);
   const setUploadFiles = useCVState((state) => state.setUploadFiles);
   const [isUploading, setIsUploading] = useState(false);
@@ -120,12 +115,12 @@ export default function CVPage() {
   });
 
   function handleUploadFiles(files) {
-    if (!position?.criterias?.length) {
-      errorNotify({
-        message: appStrings.language.cv.noCriteriaError,
-      });
-      return;
-    }
+    // if (!position?.criterias?.length) {
+    //   errorNotify({
+    //     message: appStrings.language.cv.noCriteriaError,
+    //   });
+    //   return;
+    // }
     setUploadFiles(files);
     uploadCVDataApi({
       projectId,
@@ -195,12 +190,6 @@ export default function CVPage() {
           title: appStrings.language.cv.matchSuccessTitle,
           message: appStrings.language.cv.matchSuccessMessage,
         });
-        // Set score to CVs
-        const formatedData = Object.entries(data).map(([key, value]) => ({
-          id: key,
-          score: value.overall,
-        }));
-        setCVScores(formatedData);
       },
     });
   }
@@ -236,13 +225,10 @@ export default function CVPage() {
         setCVs([]);
       },
       onSuccess: (cvs) => {
-        // Sort data by score
-        cvs.sort((a, b) => b.score.overall - a.score.overall);
         const formatedCVs = cvs.map((cv) => ({
           id: cv.id,
           cvName: cv.name,
           upload: cv.upload_at,
-          score: cv.score.overall,
         }));
         setCVs(formatedCVs);
       },
@@ -383,13 +369,6 @@ export default function CVPage() {
             </Flex>
           ),
           upload: formatDate(data.upload, true),
-          score: data.score ? (
-            <Badge variant="light" color={getScoreColor(data.score)}>
-              {data.score}%
-            </Badge>
-          ) : (
-            <Text c="dimmed">{appStrings.language.cv.notScored}</Text>
-          ),
           actions: (
             <Flex gap="xs">
               <Tooltip
