@@ -1,10 +1,10 @@
 import english from "../language/english";
 import vietnamese from "../language/vietnamese";
-import japanese from "../language/japanese";
-import korean from "../language/korean";
-import chinese from "../language/chinese";
-import hindi from "../language/hindi";
-import france from "../language/france";
+// import japanese from "../language/japanese";
+// import korean from "../language/korean";
+// import chinese from "../language/chinese";
+// import hindi from "../language/hindi";
+// import france from "../language/france";
 
 function getLanguageStrings(language) {
   switch (language) {
