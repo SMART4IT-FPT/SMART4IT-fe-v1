@@ -13,7 +13,7 @@ export async function getYourProjectsApi({ onFail, onSuccess }) {
   }
   // Send get request
   const params = {
-    get_type: "owned",
+    get_type: "OWNER",
   };
   const response = await apiHelper.get(apiUrls.getProjects, params);
   // Handle response
@@ -39,7 +39,7 @@ export async function getSharedProjectsApi({ onFail, onSuccess }) {
   }
   // Send get request
   const params = {
-    get_type: "shared",
+    get_type: "RECRUITER",
   };
   const response = await apiHelper.get(apiUrls.getProjects, params);
   // Handle response

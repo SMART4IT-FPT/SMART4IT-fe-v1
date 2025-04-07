@@ -14,6 +14,7 @@ import PositionPageLayout from "../pages/Position/PageLayout";
 import PositionGeneralPage from "../pages/Position/PositionGeneral";
 import JDPage from "../pages/Position/JD";
 import CVPage from "../pages/Position/CV";
+import MatchingResultPage from "../pages/Position/MatchingResult";
 import CVDetailPage from "../pages/Position/CVDetail";
 import RedirectPage from "../pages/Utils/Redirect";
 import NotFoundPage from "../pages/Utils/NotFound";
@@ -93,12 +94,16 @@ const appRoutes = [
         element: <PositionGeneralPage />,
       },
       {
+        path: "/:project-id/:position-id/jd",
+        element: <JDPage />,
+      },
+      {
         path: "/:project-id/:position-id/cv",
         element: <CVPage />,
       },
       {
-        path: "/:project-id/:position-id/jd",
-        element: <JDPage />,
+        path: "/:project-id/:position-id/result",
+        element: <MatchingResultPage />,
       },
       {
         path: "/:project-id/:position-id/cv/:cv-id",

@@ -177,6 +177,9 @@ const english = {
     stepHire: "Hired",
     detailTable: "Keyword Detail",
   },
+  matchingResult: {
+    title: "Matching Result",
+  },
   share: {
     title: "Share member",
     searchPlaceholder: "Typing email to search",
