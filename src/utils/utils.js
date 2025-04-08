@@ -39,15 +39,15 @@ export function removeWhiteSpace(str) {
   return str.replace(/\s/g, "");
 }
 
-export function getScoreColor(score) {
-  if (score < 40) {
-    return "red";
-  } else if (score >= 80) {
-    return "green";
-  } else {
-    return "orange";
-  }
-}
+// export function getScoreColor(score) {
+//   if (score < 40) {
+//     return "red";
+//   } else if (score >= 80) {
+//     return "green";
+//   } else {
+//     return "orange";
+//   }
+// }
 
 export function getShareUploadUrl(id) {
   const baseUrl = window.location.origin;

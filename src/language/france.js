@@ -1,6 +1,6 @@
 
 const france = {
-  login: "Connexion à CVEZ",
+  login: "Connexion à SMART4IT",
   home: {
     title: "Accueil",
     welcome: "Bienvenue ",
@@ -194,8 +194,8 @@ const france = {
     take:'Faites le premier pas vers votre emploi de rêve aujourd\'hui!',
     abouttitle:'À propos',
     about:'Croissance de carrière grâce à des connexions stratégiques',
-    aboutcontent1:'Chez CVEZ, nous reconnaissons que pour débloquer votre potentiel de carrière, une approche holistique est nécessaire. Notre plateforme va au-delà des soumissions de CV traditionnelles, servant de conduit pour connecter les chercheurs d\'emploi avec les bonnes opportunités. Nous croyons que les bonnes connexions peuvent faire toute la différence dans votre parcours de carrière. Notre plateforme est conçue pour vous aider à établir ces connexions, afin que vous puissiez faire le premier pas vers votre emploi de rêve aujourd\'hui.',
-    aboutcontent2:'Nous défendons le droit de chaque individu à s\'épanouir dans la trajectoire de carrière de son choix. CVEZ donne aux utilisateurs le pouvoir en fournissant des informations sur leur compatibilité avec les descriptions de poste, permettant des décisions de carrière éclairées et favorisant la croissance professionnelle. Notre plateforme est conçue pour vous aider à établir ces connexions, afin que vous puissiez faire le premier pas vers votre emploi de rêve aujourd\'hui.',
+    aboutcontent1:'Chez SMART4IT",, nous reconnaissons que pour débloquer votre potentiel de carrière, une approche holistique est nécessaire. Notre plateforme va au-delà des soumissions de CV traditionnelles, servant de conduit pour connecter les chercheurs d\'emploi avec les bonnes opportunités. Nous croyons que les bonnes connexions peuvent faire toute la différence dans votre parcours de carrière. Notre plateforme est conçue pour vous aider à établir ces connexions, afin que vous puissiez faire le premier pas vers votre emploi de rêve aujourd\'hui.',
+    aboutcontent2:'Nous défendons le droit de chaque individu à s\'épanouir dans la trajectoire de carrière de son choix. SMART4IT", donne aux utilisateurs le pouvoir en fournissant des informations sur leur compatibilité avec les descriptions de poste, permettant des décisions de carrière éclairées et favorisant la croissance professionnelle. Notre plateforme est conçue pour vous aider à établir ces connexions, afin que vous puissiez faire le premier pas vers votre emploi de rêve aujourd\'hui.',
     contacttitle:'Contactez-nous',
     contactcontent1:'Nous aimerions avoir de vos nouvelles! N\'hésitez pas à nous contacter via le formulaire de contact ci-dessous, et nous vous répondrons dès que possible.',
     contactcontent2:'Ou envoyez-nous un email à:',

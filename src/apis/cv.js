@@ -147,28 +147,6 @@ export async function deleteCVDataApi({
   }
 }
 
-export async function summaryAIApi({
-  projectId,
-  positionId,
-  cvId,
-  onFail,
-  onSuccess,
-}) {
-  const response = await apiHelper.get(
-    apiUrls.summaryCV(projectId, positionId, cvId)
-  );
-  // Handle response
-  if (response.msg) {
-    console.log(response.msg);
-    if (response.data) {
-      onSuccess(response.data);
-    } else {
-      onFail(appStrings.language.utils.noDataFound);
-    }
-  } else {
-    onFail(response.detail);
-  }
-}
 
 export async function getCVKeywordDetailApi({
   projectId,

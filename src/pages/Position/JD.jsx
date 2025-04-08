@@ -54,12 +54,12 @@ export default function JDPage() {
   const [jd, setJD] = useState(null);
 
   function handleSaveJD() {
-    if (!position?.criterias?.length) {
-      errorNotify({
-        message: appStrings.language.jd.noCriteriaError,
-      });
-      return;
-    }
+    // if (!position?.criterias?.length) {
+    //   errorNotify({
+    //     message: appStrings.language.jd.noCriteriaError,
+    //   });
+    //   return;
+    // }
     setIsLoading(true);
     const content = editorController?.getHTML();
     if (content === "<p></p>") {
@@ -183,8 +183,12 @@ export default function JDPage() {
       </Flex>
       {Object.keys(jd?.extraction || {}).length ? <Divider /> : null}
       <Flex direction="column" gap="xl" mb="xl">
-        {jd
-          ? Object.entries(jd.extraction).map(([key, value]) => (
+        {jd && jd.extraction && Object.keys(jd.extraction).length > 0 ? (
+          <Divider />
+        ) : null}
+        <Flex direction="column" gap="xl" mb="xl">
+          {jd && jd.extraction
+            ? Object.entries(jd.extraction).map(([key, value]) => (
               <Flex direction="column" gap="md">
                 <Flex align="center" gap="md">
                   <Title order={3}>{key}</Title>
@@ -210,7 +214,8 @@ export default function JDPage() {
                 </Flex>
               </Flex>
             ))
-          : null}
+            : null}
+        </Flex>
       </Flex>
     </Flex>
   );

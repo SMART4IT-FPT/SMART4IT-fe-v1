@@ -1,6 +1,6 @@
 const english = {
   auth: {
-    login: "Login to CVEZ",
+    login: "Login to SMART4IT",
     logout: "Logout",
     noLogin: "You are not logged in",
   },
@@ -68,9 +68,9 @@ const english = {
   },
   insight: {
     title: "Insight",
-    heading: "CVEZ Insight",
+    heading: "SMART4IT Insight",
     introduction:
-      "CVEZ Insight help you analyze detail about the recruitment position, about the distribution of skills among candidates' scores.",
+      "SMART4IT Insight help you analyze detail about the recruitment position, about the distribution of skills among candidates' scores.",
     selectPlaceholder: "Select position",
     viewInsightBtn: "View Insight",
   },

@@ -1,7 +1,8 @@
 export const googleClientId =
   "765198139881-0vdveqqf338q0g9nvkclphnockf9f35n.apps.googleusercontent.com";
 
-export const baseUrl = "http://localhost:7860";
+export const baseUrl = "http://127.0.0.1:7860";
+// export const baseUrl = "http://localhost:8000";
 
 export const apiUrls = {
   // Auth
