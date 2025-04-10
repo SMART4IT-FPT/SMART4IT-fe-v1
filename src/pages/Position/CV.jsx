@@ -13,8 +13,7 @@ import {
   Loader,
   Popover,
   Slider,
-  Grid,
-  Paper,
+  Select,
 } from "@mantine/core";
 import {
   IconTrash,
@@ -56,28 +55,21 @@ import useInterval from "../../hooks/useInterval";
 import useSearch from "../../hooks/useSearch";
 import useConfirmModal from "../../hooks/useConfirmModal";
 
-const columns = [
-  {
-    key: "cvName",
-    label: appStrings.language.cv.tableCVName,
-  },
-  {
-    key: "upload",
-    label: appStrings.language.cv.tableUploadDate,
-  },
-  {
-    key: "componentScores",
-    label: "Component Scores", // New column label
-  },
-  {
-    key: "overallScore",
-    label: "Overall Score", // New column label
-  },
-  {
-    key: "actions",
-    label: appStrings.language.cv.tableAction,
-  },
+
+
+const LABELS = [
+  "Database_Administrator",
+  "Front_End_Developer",
+  "Java_Developer",
+  "Network_Administrator",
+  "Project_manager",
+  "Python_Developer",
+  "Security_Analyst",
+  "Software_Developer",
+  "Systems_Administrator",
+  "Web_Developer",
 ];
+
 
 export default function CVPage() {
   const navigate = useNavigate();
@@ -89,6 +81,61 @@ export default function CVPage() {
   const setCVs = useCVState((state) => state.setCVs);
   const uploadFiles = useCVState((state) => state.uploadFiles);
   const setUploadFiles = useCVState((state) => state.setUploadFiles);
+  const [sortOrder, setSortOrder] = useState("desc"); // "asc" | "desc"
+  const [labelFilter, setLabelFilter] = useState(null);
+
+  const columns = [
+    {
+      key: "cvName",
+      label: appStrings.language.cv.tableCVName,
+    },
+    {
+      key: "upload",
+      label: appStrings.language.cv.tableUploadDate,
+    },
+    {
+      key: "componentScores",
+      label: "Component Scores",
+    },
+    {
+      key: "overallScore",
+      label: (
+        <Flex align="center" gap={4}>
+          <Text>Overall Score</Text>
+          <Tooltip label={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`} withArrow>
+            <ActionIcon
+              variant="subtle"
+              size="xs"
+              onClick={() =>
+                setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+              }
+            >
+              <Flex direction="column" align="center" justify="center" gap={0} style={{ lineHeight: 1 }}>
+                <IconChevronUp
+                  size="0.75rem"
+                  color={sortOrder === "desc" ? "gray" : "black"}
+                  style={{ marginBottom: "-2px" }}
+                />
+                <IconChevronDown
+                  size="0.75rem"
+                  color={sortOrder === "asc" ? "gray" : "black"}
+                />
+              </Flex>
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
+      ),
+    },
+    {
+      key: "label",
+      label: "Label",
+    },
+    {
+      key: "actions",
+      label: appStrings.language.cv.tableAction,
+    },
+  ];
+
   const [isUploading, setIsUploading] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
   const [progressObject, setProgressObject] = useState({});
@@ -173,11 +220,11 @@ export default function CVPage() {
       });
       return;
     }
-  
+
     setIsMatching(true);
-  
+
     const scores = {};
-  
+
     try {
       // Fetch all CVs using getCVsApi
       getCVsApi({
@@ -187,7 +234,7 @@ export default function CVPage() {
           // Map through each CV to fetch their individual scores
           cvData.forEach((cv) => {
             const matchingResult = cv.matching?.overall_result || {};
-  
+
             scores[cv.id] = {
               educationScore: matchingResult.education_score || 0,
               languageScore: matchingResult.language_skills_score || 0,
@@ -198,7 +245,7 @@ export default function CVPage() {
               publicationsScore: matchingResult.publications_score || 0,
             };
           });
-  
+
           // Set the fetched scores in the state
           setCvScores(scores);
           setIsMatching(false);
@@ -223,7 +270,7 @@ export default function CVPage() {
       setIsMatching(false);
     }
   }
-  
+
   function handleDeleteCV(id) {
     deleteCVDataApi({
       projectId,
@@ -259,6 +306,7 @@ export default function CVPage() {
           id: cv.id,
           cvName: cv.name,
           upload: cv.upload_at,
+          labels: (cv.labels || []).map((l) => l.toLowerCase()),
         }));
         setCVs(formatedCVs);
       },
@@ -373,6 +421,18 @@ export default function CVPage() {
             </Flex>
           </Popover.Dropdown>
         </Popover>
+        <Select
+          placeholder="Filter by Label"
+          data={LABELS.map((label) => ({
+            value: label.toLowerCase(),
+            label: label.replace(/_/g, " "),
+          }))}
+          clearable
+          value={labelFilter}
+          onChange={setLabelFilter}
+          style={{ width: 220 }}
+        />
+
         <Button
           leftSection={<IconSparkles size="1rem" />}
           onClick={handleMatchCVJD}
@@ -383,148 +443,170 @@ export default function CVPage() {
         </Button>
       </Flex>
       <AppTable
-  columns={columns}
-  loading={!search}
-  data={search?.map((data) => {
-    const scores = cvScores[data.id] || {};  // This will fallback to an empty object if scores are not yet available
+        columns={columns}
+        loading={!search}
+        data={(Array.isArray(search) ? [...search] : [])
+          .filter((cv) => {
+            if (!labelFilter) return true;
+            return (cv.labels || []).some(
+              (lb) => lb.toLowerCase().replace(/ /g, "_") === labelFilter.toLowerCase()
+            );
+          })          
+          .sort((a, b) => {
+            const scoreA = cvScores[a.id]?.overallScore || 0;
+            const scoreB = cvScores[b.id]?.overallScore || 0;
+            return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
+          })
+          .map((data) => {
+            const scores = cvScores[data.id] || {};  // This will fallback to an empty object if scores are not yet available
+            const label = data.label || "No Label";  // Default to "No Label" if label is not available
 
-    // Ensure that we don't attempt to call .toFixed() on undefined or null values
-    const educationScore = scores.educationScore || 0;
-    const languageScore = scores.languageScore || 0;
-    const technicalScore = scores.technicalScore || 0;
-    const experienceScore = scores.experienceScore || 0;
-    const overallScore = scores.overallScore || 0; // Default to 0 if undefined
-    const personalProjectsScore = scores.personalProjectsScore || 0;
-    const publicationsScore = scores.publicationsScore || 0;
+            // Ensure that we don't attempt to call .toFixed() on undefined or null values
+            const educationScore = scores.educationScore || 0;
+            const languageScore = scores.languageScore || 0;
+            const technicalScore = scores.technicalScore || 0;
+            const experienceScore = scores.experienceScore || 0;
+            const overallScore = scores.overallScore || 0; // Default to 0 if undefined
+            const personalProjectsScore = scores.personalProjectsScore || 0;
+            const publicationsScore = scores.publicationsScore || 0;
 
-    return {
-      cvName: (
-        <Flex align="center" gap="md">
-          {data.cvName.toLowerCase().includes(".pdf") ? (
-            <IconFileTypePdf size="1rem" color="#E03131" />
-          ) : data.cvName.toLowerCase().includes(".docx") ? (
-            <IconFileTypeDocx size="1rem" color="#3B5BDB" />
-          ) : (
-            <IconFile size="1rem" />
-          )}
-          <Text>{data.cvName}</Text>
-        </Flex>
-      ),
-      upload: (
-        <Text size="md">
-    {formatDate(data.upload, true)}
-    </Text>
-      ),
-      componentScores: (
-        <Flex direction="column" gap="sm">
-          <Flex align="center" gap="xs">
-            <Text size="md">Education Score:</Text>
-            <Badge
-              color={educationScore === 0 ? "gray" : educationScore >= 66 ? "green" : educationScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {educationScore}
-            </Badge>
-          </Flex>
-          <Flex align="center" gap="xs">
-            <Text size="md">Language Score:</Text>
-            <Badge
-              color={languageScore === 0 ? "gray" : languageScore >= 66 ? "green" : languageScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {languageScore}
-            </Badge>
-          </Flex>
-          <Flex align="center" gap="xs">
-            <Text size="md">Technical Score:</Text>
-            <Badge
-              color={technicalScore === 0 ? "gray" : technicalScore >= 66 ? "green" : technicalScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {technicalScore}
-            </Badge>
-          </Flex>
-          <Flex align="center" gap="xs">
-            <Text size="md">Experience Score:</Text>
-            <Badge
-              color={experienceScore === 0 ? "gray" : experienceScore >= 66 ? "green" : experienceScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {experienceScore}
-            </Badge>
-          </Flex>
-          <Flex align="center" gap="xs">
-            <Text size="md">Personal Projects Score:</Text>
-            <Badge
-              color={personalProjectsScore === 0 ? "gray" : personalProjectsScore >= 66 ? "green" : personalProjectsScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {personalProjectsScore}
-            </Badge>
-            </Flex>
-          <Flex align="center" gap="xs">
-            <Text size="md">Publications Score:</Text>
-            <Badge
-              color={publicationsScore === 0 ? "gray" : publicationsScore >= 66 ? "green" : publicationsScore >= 33 ? "orange" : "red"}
-              variant="filled"
-              size="lg"
-            >
-              {publicationsScore}
-            </Badge>
-            </Flex>
-        </Flex>
-      ),
-      
-      
-      
-      overallScore: (
-        <Flex>
-          <Badge 
-            color={isNaN(overallScore) || overallScore === 0 ? "gray" : "violet"} 
-            variant="filled" 
-            size="lg" 
-            style={{ 
-              width: '100px',  // Set fixed width for the Badge
-              textAlign: 'center',  // Center text inside the badge
-              padding: '5px'  // Optional: Adjust padding to control size
-            }}
-          >
-            {isNaN(overallScore) || overallScore === 0 ? "0" : overallScore.toFixed(1)}
-          </Badge>
-        </Flex>
-      ),
-      
-      
-      actions: (
-        <Flex gap="xs">
-          <Tooltip label={appStrings.language.cv.viewActionTooltip} withArrow>
-            <ActionIcon
-              variant="subtle"
-              onClick={() => handleNavigateToCVDetail(data.id)}
-            >
-              <IconEye size="1.5rem" />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label={appStrings.language.btn.delete} withArrow>
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              onClick={() => deleteCVTrigger(data.id)}
-            >
-              <IconTrash size="1.5rem" />
-            </ActionIcon>
-          </Tooltip>
-        </Flex>
-      ),
-    };
-  })}
-  pageSize={5}
-/>
+            return {
+              cvName: (
+                <Flex align="center" gap="md">
+                  {data.cvName.toLowerCase().includes(".pdf") ? (
+                    <IconFileTypePdf size="1rem" color="#E03131" />
+                  ) : data.cvName.toLowerCase().includes(".docx") ? (
+                    <IconFileTypeDocx size="1rem" color="#3B5BDB" />
+                  ) : (
+                    <IconFile size="1rem" />
+                  )}
+                  <Text>{data.cvName}</Text>
+                </Flex>
+              ),
+              upload: (
+                <Text size="md">
+                  {formatDate(data.upload, true)}
+                </Text>
+              ),
+              componentScores: (
+                <Flex direction="column" gap="sm">
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Education Score:</Text>
+                    <Badge
+                      color={educationScore === 0 ? "gray" : educationScore >= 66 ? "green" : educationScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {educationScore}
+                    </Badge>
+                  </Flex>
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Language Score:</Text>
+                    <Badge
+                      color={languageScore === 0 ? "gray" : languageScore >= 66 ? "green" : languageScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {languageScore}
+                    </Badge>
+                  </Flex>
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Technical Score:</Text>
+                    <Badge
+                      color={technicalScore === 0 ? "gray" : technicalScore >= 66 ? "green" : technicalScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {technicalScore}
+                    </Badge>
+                  </Flex>
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Experience Score:</Text>
+                    <Badge
+                      color={experienceScore === 0 ? "gray" : experienceScore >= 66 ? "green" : experienceScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {experienceScore}
+                    </Badge>
+                  </Flex>
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Personal Projects Score:</Text>
+                    <Badge
+                      color={personalProjectsScore === 0 ? "gray" : personalProjectsScore >= 66 ? "green" : personalProjectsScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {personalProjectsScore}
+                    </Badge>
+                  </Flex>
+                  <Flex align="center" gap="xs">
+                    <Text size="md">Publications Score:</Text>
+                    <Badge
+                      color={publicationsScore === 0 ? "gray" : publicationsScore >= 66 ? "green" : publicationsScore >= 33 ? "orange" : "red"}
+                      variant="filled"
+                      size="lg"
+                    >
+                      {publicationsScore}
+                    </Badge>
+                  </Flex>
+                </Flex>
+              ),
+
+              overallScore: (
+                <Flex>
+                  <Badge
+                    color={isNaN(overallScore) || overallScore === 0 ? "gray" : "violet"}
+                    variant="filled"
+                    size="lg"
+                    style={{
+                      width: '100px',  // Set fixed width for the Badge
+                      textAlign: 'center',  // Center text inside the badge
+                      padding: '5px'  // Optional: Adjust padding to control size
+                    }}
+                  >
+                    {isNaN(overallScore) || overallScore === 0 ? "0" : overallScore.toFixed(1)}
+                  </Badge>
+                </Flex>
+              ),
+
+              label: (
+                <Flex direction="column" gap={4}>
+                  {(data.labels || []).map((lb, idx) => (
+                    <Badge key={idx} color="blue" variant="light" size="sm">
+                      {lb}
+                    </Badge>
+                  ))}
+                </Flex>
+
+              ),
+
+
+              actions: (
+                <Flex gap="xs">
+                  <Tooltip label={appStrings.language.cv.viewActionTooltip} withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      onClick={() => handleNavigateToCVDetail(data.id)}
+                    >
+                      <IconEye size="1.5rem" />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label={appStrings.language.btn.delete} withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      onClick={() => deleteCVTrigger(data.id)}
+                    >
+                      <IconTrash size="1.5rem" />
+                    </ActionIcon>
+                  </Tooltip>
+                </Flex>
+              ),
+            };
+          })}
+        pageSize={5}
+      />
 
 
     </Flex>

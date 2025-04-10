@@ -141,7 +141,7 @@ export default function ProjectSettingPage() {
               ) : null,
             ];
           })}
-        />
+        />  
       </SettingLayout>
       <ShareProjectModal
         open={isShareModalOpen}

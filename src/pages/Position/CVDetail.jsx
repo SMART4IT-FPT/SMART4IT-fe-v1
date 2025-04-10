@@ -202,122 +202,156 @@ export default function CVDetailPage() {
       </Flex>
 
       {(cv?.summary || isLoadingSummary) && (
-  <Blockquote color="violet" icon={<IconSparkles size="1rem" />}>
-    {isLoadingSummary ? (
-      <Flex direction="column" gap="sm">
-        <Skeleton h={20} />
-        <Skeleton h={20} w={200} />
-      </Flex>
-    ) : (
-      <Flex direction="column" gap="md">
-        
-        {/* Professional Summary */}
-        <Text size="sm" c="dimmed">
-          {cv?.summary?.ProfessionalSummary}
-        </Text>
+        <Blockquote color="violet" icon={<IconSparkles size="1rem" />} mt="md">
+          {isLoadingSummary ? (
+            <Flex direction="column" gap="sm">
+              <Skeleton h={20} />
+              <Skeleton h={20} w={200} />
+            </Flex>
+          ) : (
+            <Flex direction="column" gap="lg">
+              {/* 1. Personal Info */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>👤 Personal Information:</Text>
+                <Text size="sm">Full Name: {cv?.summary?.PersonalInformation?.FullName || "N/A"}</Text>
+                <Text size="sm">Email: {cv?.summary?.PersonalInformation?.ContactInformation?.Email || "N/A"}</Text>
+                <Text size="sm">Phone: {cv?.summary?.PersonalInformation?.ContactInformation?.PhoneNumber || "N/A"}</Text>
+                <Text size="sm">Address: {cv?.summary?.PersonalInformation?.ContactInformation?.Address || "N/A"}</Text>
+              </Flex>
 
-        {/* Personal Information */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>👤 Personal Information:</Text>
-          <Text size="sm">Full Name: {cv?.summary?.PersonalInformation?.FullName}</Text>
-          <Text size="sm">Email: {cv?.summary?.PersonalInformation?.ContactInformation?.Email}</Text>
-          <Text size="sm">Phone: {cv?.summary?.PersonalInformation?.ContactInformation?.PhoneNumber}</Text>
-          {cv?.summary?.PersonalInformation?.GitHubProfile && (
-            <Text size="sm">GitHub: {cv?.summary?.PersonalInformation?.GitHubProfile}</Text>
-          )}
-        </Flex>
+              {/* 2. 🎓 Education */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>🎓 Education:</Text>
+                {cv?.summary?.Education?.map((edu, idx) => (
+                  <Box key={idx} pl="sm">
+                    <Text size="sm">Institution: {edu.Institution || "N/A"}</Text>
+                    <Text size="sm">Degree: {edu.Degree || "N/A"}</Text>
+                    <Text size="sm">Major: {edu.Major || "N/A"}</Text>
+                    <Text size="sm">Graduation Year: {edu.GraduationYear || "N/A"}</Text>
+                  </Box>
+                ))}
 
-        {/* {CertificationsAndTraining} */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>🏅 Certifications and Training:</Text>
-          {cv?.summary?.CertificationsAndTraining?.map((cert, idx) => (
-            <Box key={idx} pl="sm">
-              <Text size="sm">Title: {cert.Title}</Text>
-              <Text size="sm">Institution: {cert.Institution}</Text>
-              <Text size="sm">Issued Date: {cert.IssuedDate}</Text>
-            </Box>
-          ))}
-        </Flex>
+                {/* ⏬ Điểm + Giải thích */}
+                <Text size="sm" fw={500}>Score: {cvDetail?.matching?.overall_result?.education_score ?? 0}</Text>
+                <Text size="sm" c="dimmed">
+                  {cvDetail?.matching?.detailed_result?.education?.explanation}
+                </Text>
+              </Flex>
 
-        {/* {Project} */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>🔧 Projects:</Text>
-          {cv?.summary?.Projects?.map((proj, idx) => (
-            <Box key={idx} pl="sm">
-              <Text size="sm">Title: {proj.Title}</Text>
-              <Text size="sm">Description: {proj.Description}</Text>
-              <Text size="sm">Duration: {proj.Duration}</Text>
-            </Box>
-          ))}
-        </Flex>
+              {/* 3. 🌐 Language */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>🌐 Language Skills:</Text>
+                {cv?.summary?.Languages?.map((lang, idx) => (
+                  <Box key={idx} pl="sm">
+                    <Text size="sm">Language: {lang.Language || "N/A"}</Text>
+                    <Text size="sm">Proficiency: {lang.ProficiencyLevel || "N/A"}</Text>
+                  </Box>
+                ))}
+                <Text size="sm" fw={500}>Score: {cvDetail?.matching?.overall_result?.language_skills_score ?? 0}</Text>
+                {cvDetail?.matching?.detailed_result?.language_skills?.map((lang, idx) => (
+                  <Box key={idx} pl="sm">
+                    <Text size="sm" c="dimmed">{lang.explanation}</Text>
+                  </Box>
+                ))}
+              </Flex>
 
-          {/* {Publications} */}
-          <Flex direction="column" gap="xs">
-            <Text fw={500}>📚 Publications:</Text>
-            {cv?.summary?.Publications?.map((pub, idx) => (
-              <Box key={idx} pl="sm">
-                <Text size="sm">Title: {pub.Title}</Text>
-                <Text size="sm">Authors: {pub.Authors}</Text>
-                <Text size="sm">Publication Date: {pub.PublicationDate}</Text>
-              </Box>
-            ))}
-          </Flex>
+              {/* 4. 🛠 Technical Skills */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>🛠️ Technical Skills:</Text>
+                <Text size="sm">{cv?.summary?.Skills?.TechnicalSkills?.join(", ") || "N/A"}</Text>
+                <Text size="sm" fw={500}>Score: {cvDetail?.matching?.overall_result?.technical_skills_score ?? 0}</Text>
+                <Text size="sm" c="dimmed">
+                  {cvDetail?.matching?.detailed_result?.technical_skills?.explanation}
+                </Text>
+              </Flex>
 
-        {/* Education */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>🎓 Education:</Text>
-          {cv?.summary?.Education?.map((edu, idx) => (
-            <Box key={idx} pl="sm">
-              <Text size="sm">Institution: {edu.Institution}</Text>
-              <Text size="sm">Degree: {edu.Degree || 'N/A'}</Text>
-              <Text size="sm">Major: {edu.Major || 'N/A'}</Text>
-              <Text size="sm">Graduation Year: {edu.GraduationYear || 'N/A'}</Text>
-            </Box>
-          ))}
-        </Flex>
+              {/* 5. 💼 Work Experience */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>💼 Work Experience:</Text>
+                {cv?.summary?.WorkExperience?.length > 0 ? (
+                  cv.summary.WorkExperience.map((work, idx) => (
+                    <Box key={idx} pl="sm">
+                      <Text size="sm">Job Title: {work.JobTitle || "N/A"}</Text>
+                      <Text size="sm">Company: {work.CompanyName || "N/A"}</Text>
+                      <Text size="sm">
+                        Duration: {work.Duration?.StartDate} - {work.Duration?.EndDate || "Present"}
+                      </Text>
+                      <Text size="sm">Responsibilities: {work.KeyResponsibilitiesAndAchievements}</Text>
+                    </Box>
+                  ))
+                ) : (
+                  <Text size="sm">No experience listed</Text>
+                )}
+                <Text size="sm" fw={500}>Score: {cvDetail?.matching?.overall_result?.work_experience_score ?? 0}</Text>
+              </Flex>
 
-        {/* Work Experience */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>💼 Work Experience:</Text>
-          {cv?.summary?.WorkExperience?.map((work, idx) => (
-            <Box key={idx} pl="sm" mb="sm">
-              <Text size="sm">Job Title: {work.JobTitle || 'N/A'}</Text>
-              <Text size="sm">Company: {work.CompanyName}</Text>
-              <Text size="sm">
-                Duration: {work.Duration.StartDate} - {work.Duration.EndDate || 'Present'}
-              </Text>
-              {work.KeyResponsibilitiesAndAchievements && (
-                <Text size="sm">Responsibilities: {work.KeyResponsibilitiesAndAchievements}</Text>
+              {/* 6. 🔧 Projects */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>🔧 Projects:</Text>
+                {cv?.summary?.Projects?.map((proj, idx) => (
+                  <Box key={idx} pl="sm" mb="xs">
+                    <Text size="sm">Title: {proj.Title || "N/A"}</Text>
+                    <Text size="sm">Description: {proj.Description || "N/A"}</Text>
+                    <Text size="sm">Technologies: {proj.TechnologiesUsed || "N/A"}</Text>
+                    <Text size="sm">Role: {proj.Role || "N/A"}</Text>
+                    {cvDetail?.matching?.detailed_result?.personal_projects?.find(p => p.project_title === proj.Title) && (
+                      <>
+                        <Text size="sm" fw={500}>
+                          Score: {
+                            cvDetail.matching.detailed_result.personal_projects.find(p => p.project_title === proj.Title)
+                              ?.relevance_score
+                          }
+                        </Text>
+                        <Text size="sm" c="dimmed">
+                          {
+                            cvDetail.matching.detailed_result.personal_projects.find(p => p.project_title === proj.Title)
+                              ?.explanation
+                          }
+                        </Text>
+                      </>
+                    )}
+                  </Box>
+                ))}
+                <Text size="sm" fw={500}>Personal Projects Total Score: {cvDetail?.matching?.overall_result?.personal_projects_score ?? 0}</Text>
+              </Flex>
+
+              {/* 7. 📚 Publications */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>📚 Publications:</Text>
+                {cv?.summary?.Publications?.length > 0 ? (
+                  cv.summary.Publications.map((pub, idx) => (
+                    <Box key={idx} pl="sm">
+                      <Text size="sm">Title: {pub.Title}</Text>
+                      <Text size="sm">Authors: {pub.Authors}</Text>
+                      <Text size="sm">Date: {pub.PublicationDate}</Text>
+                    </Box>
+                  ))
+                ) : (
+                  <Text size="sm">None</Text>
+                )}
+                <Text size="sm" fw={500}>Score: {cvDetail?.matching?.overall_result?.publications_score ?? 0}</Text>
+              </Flex>
+
+              {/* 8. 🌐 Soft Skills */}
+              <Flex direction="column" gap="xs">
+                <Text fw={500}>💬 Soft Skills:</Text>
+                <Text size="sm">
+                  {cv?.summary?.Skills?.SoftSkills?.length > 0 ? cv.summary.Skills.SoftSkills.join(", ") : "N/A"}
+                </Text>
+              </Flex>
+
+              {/* 9. 📝 Other Info */}
+              {cv?.summary?.OtherRelevantInformation && (
+                <Flex direction="column" gap="xs">
+                  <Text fw={500}>📝 Other Information:</Text>
+                  <Text size="sm">{cv.summary.OtherRelevantInformation}</Text>
+                </Flex>
               )}
-            </Box>
-          ))}
-        </Flex>
+            </Flex>
+          )}
+        </Blockquote>
 
-        {/* Skills */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>🛠️ Skills:</Text>
-          <Text size="sm">Technical: {cv?.summary?.Skills?.TechnicalSkills?.join(', ')}</Text>
-          <Text size="sm">Soft: {cv?.summary?.Skills?.SoftSkills?.join(', ')}</Text>
-        </Flex>
-
-        {/* Languages */}
-        <Flex direction="column" gap="xs">
-          <Text fw={500}>🌐 Languages:</Text>
-          {cv?.summary?.Languages?.map((lang, idx) => (
-            <Box key={idx} pl="sm">
-              <Text size="sm">Language: {lang.Language}</Text>
-              <Text size="sm">Proficiency: {lang.Proficiency}</Text>
-            </Box>
-          ))}
-        </Flex>
-
-
-
-
-      </Flex>
-    )}
-  </Blockquote>
-)}
+      )}
 
 
 
