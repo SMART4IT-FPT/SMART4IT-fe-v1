@@ -1,5 +1,5 @@
 export const googleClientId =
-  "765198139881-0vdveqqf338q0g9nvkclphnockf9f35n.apps.googleusercontent.com";
+  "484408725212-fk2jfke755huoq3jt6qi30hc2ik4tr27.apps.googleusercontent.com";
 
 export const baseUrl = "http://127.0.0.1:7860";
 // export const baseUrl = "http://localhost:8000";
