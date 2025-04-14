@@ -54,6 +54,8 @@ import {
 import useInterval from "../../hooks/useInterval";
 import useSearch from "../../hooks/useSearch";
 import useConfirmModal from "../../hooks/useConfirmModal";
+import useWeightState from "../../context/weight";
+
 
 
 
@@ -83,6 +85,8 @@ export default function CVPage() {
   const setUploadFiles = useCVState((state) => state.setUploadFiles);
   const [sortOrder, setSortOrder] = useState("desc"); // "asc" | "desc"
   const [labelFilter, setLabelFilter] = useState(null);
+  const weights = useWeightState((state) => state.weights); // Đảm bảo weights đã được lấy từ context
+
 
   const columns = [
     {
@@ -171,11 +175,18 @@ export default function CVPage() {
   });
 
   function handleUploadFiles(files) {
+    if (!weights) {
+      console.error("Trọng số chưa được lưu!");
+      return;
+    }
+  
     setUploadFiles(files);
+    console.log("Đang upload CV với trọng số:", weights);  // Log weights trước khi gửi API
     uploadCVDataApi({
       projectId,
       positionId,
       files,
+      weights: JSON.stringify(weights),  // Truyền trọng số đã được cập nhật
       onFail: (msg) => {
         errorNotify({ message: msg });
         setUploadFiles(null);
@@ -186,7 +197,6 @@ export default function CVPage() {
           initProgressObject[file.name] = 0;
         });
         setProgressObject(initProgressObject);
-
         intervalFunction({
           callback: (stop) => {
             if (!isUploading) {
@@ -212,6 +222,11 @@ export default function CVPage() {
       },
     });
   }
+  
+  
+  
+  
+  
 
   async function handleMatchCVJD() {
     if (!search.length) {

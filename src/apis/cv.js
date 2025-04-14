@@ -46,31 +46,56 @@ export async function uploadCVDataApi({
   projectId,
   positionId,
   files,
+  weights,  // Thêm weights vào tham số hàm
   onFail,
   onSuccess,
 }) {
-  // Create a FormData object
+  // Tạo đối tượng FormData
   const formData = new FormData();
+  
+  // Thêm các file vào formData
   files.forEach((file) => {
     formData.append("cvs", file);
   });
-  // Send the request
-  const response = await apiHelper.postFormData(
-    apiUrls.uploadCV(projectId, positionId),
-    formData
-  );
-  // Handle response
-  if (response.msg) {
-    console.log(response.msg);
-    if (response.data) {
-      onSuccess(response.data);
+
+  // Thêm weights vào formData dưới dạng JSON string
+  formData.append("weight", JSON.stringify(weights));
+
+  // Log FormData trước khi gửi yêu cầu POST
+  console.log("FormData trước khi gửi:", formData);
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value); // Log từng phần tử trong FormData
+  }
+
+  try {
+    // Gửi yêu cầu POST với formData
+    const response = await apiHelper.postFormData(
+      apiUrls.uploadCV(projectId, positionId),
+      formData
+    );
+
+    // Log phản hồi từ API
+    console.log("Phản hồi từ API:", response);
+
+    // Xử lý phản hồi từ API
+    if (response.msg) {
+      console.log(response.msg);
+      if (response.data) {
+        onSuccess(response.data);
+      } else {
+        onFail(appStrings.language.utils.noDataFound);
+      }
     } else {
-      onFail(appStrings.language.utils.noDataFound);
+      onFail(response.detail);
     }
-  } else {
-    onFail(response.detail);
+  } catch (error) {
+    // Log lỗi nếu có
+    console.error("Lỗi khi gửi yêu cầu:", error);
+    onFail("Lỗi khi gửi yêu cầu");
   }
 }
+
+
 
 export async function uploadCVDataPublicApi({
   positionId,
