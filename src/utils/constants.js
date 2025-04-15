@@ -55,4 +55,6 @@ export const apiUrls = {
   // Match
   matchCVJD: (projectId, positionId) =>
     `/api/v1/match/match_cv_jd/${projectId}/${positionId}`,
+  rematchCVs: (projectId, positionId) =>
+    `/api/v1/cv/${projectId}/${positionId}/rematch`,
 };

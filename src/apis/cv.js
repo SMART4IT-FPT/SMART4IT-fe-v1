@@ -46,26 +46,19 @@ export async function uploadCVDataApi({
   projectId,
   positionId,
   files,
-  weights,  // Thêm weights vào tham số hàm
+  weights,  // weight là đối tượng JSON
   onFail,
   onSuccess,
 }) {
-  // Tạo đối tượng FormData
   const formData = new FormData();
-  
+
   // Thêm các file vào formData
   files.forEach((file) => {
     formData.append("cvs", file);
   });
 
-  // Thêm weights vào formData dưới dạng JSON string
-  formData.append("weight", JSON.stringify(weights));
-
-  // Log FormData trước khi gửi yêu cầu POST
-  console.log("FormData trước khi gửi:", formData);
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value); // Log từng phần tử trong FormData
-  }
+  // Truyền weights như là đối tượng JSON, không phải chuỗi JSON
+  formData.append("weight", JSON.stringify(weights));  // sửa tại đây nếu weights đã là đối tượng
 
   try {
     // Gửi yêu cầu POST với formData
@@ -74,12 +67,7 @@ export async function uploadCVDataApi({
       formData
     );
 
-    // Log phản hồi từ API
-    console.log("Phản hồi từ API:", response);
-
-    // Xử lý phản hồi từ API
     if (response.msg) {
-      console.log(response.msg);
       if (response.data) {
         onSuccess(response.data);
       } else {
@@ -89,13 +77,10 @@ export async function uploadCVDataApi({
       onFail(response.detail);
     }
   } catch (error) {
-    // Log lỗi nếu có
     console.error("Lỗi khi gửi yêu cầu:", error);
     onFail("Lỗi khi gửi yêu cầu");
   }
 }
-
-
 
 export async function uploadCVDataPublicApi({
   positionId,
@@ -193,5 +178,31 @@ export async function getCVKeywordDetailApi({
     }
   } else {
     onFail(response.detail);
+  }
+}
+
+export async function rematchCVDataApi({
+  projectId,
+  positionId,
+  weights,
+  onFail,
+  onSuccess,
+}) {
+  try {
+    const response = await apiHelper.post(
+      apiUrls.rematchCVs(projectId, positionId),
+      {
+        weight: weights,
+      }
+    );
+
+    if (response.msg) {
+      onSuccess(response.data);
+    } else {
+      onFail(response.detail || "Rematch failed");
+    }
+  } catch (error) {
+    console.error("Lỗi khi gửi yêu cầu rematch:", error);
+    onFail("Lỗi khi gửi yêu cầu rematch");
   }
 }
