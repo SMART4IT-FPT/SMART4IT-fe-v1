@@ -2,9 +2,9 @@ import english from "../language/english";
 import vietnamese from "../language/vietnamese";
 // import japanese from "../language/japanese";
 // import korean from "../language/korean";
-// import chinese from "../language/chinese";
+import chinese from "../language/chinese";
 // import hindi from "../language/hindi";
-// import france from "../language/france";
+import france from "../language/france";
 
 function getLanguageStrings(language) {
   switch (language) {
@@ -16,12 +16,12 @@ function getLanguageStrings(language) {
     //   return japanese;
     // case "ko":
     //   return korean;
-    // case "zh":
-    //   return chinese;
+    case "zh":
+      return chinese;
     // case "hi":
     //   return hindi;
-    // case "fr":
-    //   return france;
+    case "fr":
+      return france;
     default:
       return english;
   }
@@ -32,9 +32,9 @@ export const languageOptions = [
   { value: "vi", label: "🇻🇳 Tiếng Việt" },
   // { value: "ja", label: "🇯🇵 日本語" },
   // { value: "ko", label: "🇰🇷 한국어" },
-  // { value: "zh", label: "🇨🇳 中文" },
+  { value: "zh", label: "🇨🇳 中文" },
   // { value: "hi", label: "🇮🇳 हिन्दी" },
-  // { value: "fr", label: "🇫🇷 Français" },
+    { value: "fr", label: "🇫🇷 Français" },
 ];
 
 const appStrings = {

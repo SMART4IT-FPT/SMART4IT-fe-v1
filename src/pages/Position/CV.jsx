@@ -84,10 +84,10 @@ export default function CVPage() {
   const setCVs = useCVState((state) => state.setCVs);
   const uploadFiles = useCVState((state) => state.uploadFiles);
   const setUploadFiles = useCVState((state) => state.setUploadFiles);
-  const [sortOrder, setSortOrder] = useState("desc"); // "asc" | "desc"
+  const [sortOrder, setSortOrder] = useState("desc"); 
   const [labelFilter, setLabelFilter] = useState(null);
-  const weights = useWeightState((state) => state.weights); // Đảm bảo weights đã được lấy từ context
-  const [isRematching, setIsRematching] = useState(false); // cho Rematch riêng
+  const weights = useWeightState((state) => state.weights); 
+  const [isRematching, setIsRematching] = useState(false); 
 
 
 
@@ -102,17 +102,17 @@ export default function CVPage() {
     },
     {
       key: "label",
-      label: "Label",
+      label: appStrings.language.cv.tableLabel,
     },
     {
       key: "componentScores",
-      label: "Component Scores",
+      label: appStrings.language.cv.tableComponentScore,
     },
     {
       key: "overallScore",
       label: (
         <Flex align="center" gap={4}>
-          <Text style={{ fontWeight: "bold" }}>Overall Score</Text>
+          <Text style={{ fontWeight: "bold" }}>{appStrings.language.cv.tableOverallScore}</Text>
           <Tooltip label={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`} withArrow>
             <ActionIcon
               variant="subtle"
@@ -150,7 +150,7 @@ export default function CVPage() {
     limit: 20,
     threshold: 0.6,
   });
-  const [cvScores, setCvScores] = useState({}); // Initialize cvScores state
+  const [cvScores, setCvScores] = useState({}); 
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
   const intervalFunction = useInterval(500);
@@ -179,13 +179,10 @@ export default function CVPage() {
 
   function handleUploadFiles(files) {
     if (!weights) {
-      console.error("Trọng số chưa được lưu!");
       return;
     }
 
     setUploadFiles(files);
-    console.log("Đang upload CV với trọng số:", weights);
-
     uploadCVDataApi({
       projectId,
       positionId,
@@ -202,7 +199,6 @@ export default function CVPage() {
         });
         setProgressObject(initProgressObject);
 
-        // Giới hạn cập nhật trạng thái để tránh log liên tục
         intervalFunction({
           callback: (stop) => {
             if (!isUploading) {
@@ -268,22 +264,20 @@ export default function CVPage() {
           setCvScores(scores);
           setIsMatching(false);
           successNotify({
-            title: appStrings.language.cv.matchSuccessTitle,
-            message: appStrings.language.cv.matchSuccessMessage,
+            title: appStrings.language.cv.showSuccessTitle,
+            message: appStrings.language.cv.showSuccessMessage,
           });
         },
         onFail: (error) => {
-          console.error("Error fetching CV data:", error);
           errorNotify({
-            message: "Error fetching CVs or scores.",
+            message: appStrings.language.cv.fetchErrorMessage,
           });
           setIsMatching(false);
         },
       });
     } catch (error) {
-      console.error("Error fetching CV data:", error);
       errorNotify({
-        message: "Error fetching CVs or scores.",
+        message: appStrings.language.cv.fetchErrorMessage,
       });
       setIsMatching(false);
     }
@@ -291,26 +285,29 @@ export default function CVPage() {
 
   async function handleRematchCVs() {
     if (!weights) {
-      errorNotify({ message: "Vui lòng cấu hình trọng số trước." });
+      errorNotify({ message: appStrings.language.cv.configureWeightMessage });
       return;
     }
+    console.log("Trọng số (weights) hiện tại:", weights);
   
-    setIsRematching(true); // 👈 dùng riêng
+    setIsRematching(true);
   
+    // Gửi request rematch tới API, truyền weights trực tiếp mà không bọc trong 'weight'
     await rematchCVDataApi({
       projectId,
       positionId,
-      weights,
+      weights: weights,  // Truyền trực tiếp đối tượng weights
       onFail: (msg) => {
         errorNotify({ message: msg });
-        setIsRematching(false); // 👈
+        setIsRematching(false);  // Đặt lại trạng thái khi gặp lỗi
       },
       onSuccess: (result) => {
         successNotify({
-          title: "Cập nhật điểm thành công!",
-          message: "Tất cả CV đã được rematch lại.",
+          title: appStrings.language.cv.rematchSuccessTitle,
+          message: appStrings.language.cv.rematchSuccessMessage,
         });
   
+        // Sau khi rematch thành công, lấy lại danh sách CVs
         getCVsApi({
           projectId,
           positionId,
@@ -326,12 +323,13 @@ export default function CVPage() {
           },
         });
   
-        setIsRematching(false); // 👈
+        setIsRematching(false);  // Đặt lại trạng thái sau khi hoàn thành
       },
     });
   }
   
-
+  
+  
 
   function handleDeleteCV(id) {
     deleteCVDataApi({
@@ -487,7 +485,7 @@ export default function CVPage() {
           </Popover.Dropdown>
         </Popover>
         <Select
-          placeholder="Filter by Label"
+          placeholder={appStrings.language.cv.filter}
           data={LABELS.map((label) => ({
             value: label.toLowerCase(),
             label: label.replace(/_/g, " "),
@@ -505,7 +503,7 @@ export default function CVPage() {
           loading={isRematching}
           disabled={isUploading}
         >
-          Rematch
+          {appStrings.language.cv.rematchBtn}
         </Button>
 
         <Button
@@ -514,7 +512,7 @@ export default function CVPage() {
           loading={isMatching}
           disabled={isUploading}
         >
-          {appStrings.language.cv.matchBtn}
+          {appStrings.language.cv.showBtn}
         </Button>
       </Flex>
       <AppTable
@@ -533,15 +531,14 @@ export default function CVPage() {
             return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
           })
           .map((data) => {
-            const scores = cvScores[data.id] || {};  // This will fallback to an empty object if scores are not yet available
-            const label = data.label || "No Label";  // Default to "No Label" if label is not available
+            const scores = cvScores[data.id] || {};  
+            const label = data.label || "No Label";
 
-            // Ensure that we don't attempt to call .toFixed() on undefined or null values
             const educationScore = scores.educationScore || 0;
             const languageScore = scores.languageScore || 0;
             const technicalScore = scores.technicalScore || 0;
             const experienceScore = scores.experienceScore || 0;
-            const overallScore = scores.overallScore || 0; // Default to 0 if undefined
+            const overallScore = scores.overallScore || 0; 
             const personalProjectsScore = scores.personalProjectsScore || 0;
             const publicationsScore = scores.publicationsScore || 0;
 
@@ -566,7 +563,7 @@ export default function CVPage() {
               componentScores: (
                 <Flex direction="column" gap="sm">
                   <Flex align="center" gap="xs">
-                    <Text size="md">Education Score:</Text>
+                    <Text size="md">{appStrings.language.cv.educationScore}</Text>
                     <Badge
                       color={educationScore === 0 ? "gray" : educationScore >= 66 ? "green" : educationScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -576,7 +573,9 @@ export default function CVPage() {
                     </Badge>
                   </Flex>
                   <Flex align="center" gap="xs">
-                    <Text size="md">Language Score:</Text>
+                    <Text size="md">
+                      {appStrings.language.cv.languageScore}
+                    </Text>
                     <Badge
                       color={languageScore === 0 ? "gray" : languageScore >= 66 ? "green" : languageScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -586,7 +585,9 @@ export default function CVPage() {
                     </Badge>
                   </Flex>
                   <Flex align="center" gap="xs">
-                    <Text size="md">Technical Score:</Text>
+                    <Text size="md">
+                      {appStrings.language.cv.technicalScore}
+                    </Text>
                     <Badge
                       color={technicalScore === 0 ? "gray" : technicalScore >= 66 ? "green" : technicalScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -596,7 +597,9 @@ export default function CVPage() {
                     </Badge>
                   </Flex>
                   <Flex align="center" gap="xs">
-                    <Text size="md">Experience Score:</Text>
+                    <Text size="md">
+                      {appStrings.language.cv.experienceScore}
+                    </Text>
                     <Badge
                       color={experienceScore === 0 ? "gray" : experienceScore >= 66 ? "green" : experienceScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -606,7 +609,9 @@ export default function CVPage() {
                     </Badge>
                   </Flex>
                   <Flex align="center" gap="xs">
-                    <Text size="md">Personal Projects Score:</Text>
+                    <Text size="md">
+                      {appStrings.language.cv.personalProjectScore}
+                    </Text>
                     <Badge
                       color={personalProjectsScore === 0 ? "gray" : personalProjectsScore >= 66 ? "green" : personalProjectsScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -616,7 +621,9 @@ export default function CVPage() {
                     </Badge>
                   </Flex>
                   <Flex align="center" gap="xs">
-                    <Text size="md">Publications Score:</Text>
+                    <Text size="md">
+                      {appStrings.language.cv.publicationScore}
+                    </Text>
                     <Badge
                       color={publicationsScore === 0 ? "gray" : publicationsScore >= 66 ? "green" : publicationsScore >= 33 ? "orange" : "red"}
                       variant="filled"
@@ -635,9 +642,8 @@ export default function CVPage() {
                     variant="filled"
                     size="lg"
                     style={{
-                      width: '100px',  // Set fixed width for the Badge
-                      textAlign: 'center',  // Center text inside the badge
-                      padding: '5px'  // Optional: Adjust padding to control size
+                      width: '100px',
+                      padding: '5px'
                     }}
                   >
                     {isNaN(overallScore) || overallScore === 0 ? "0" : overallScore.toFixed(1)}

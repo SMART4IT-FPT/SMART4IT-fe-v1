@@ -189,11 +189,10 @@ export async function rematchCVDataApi({
   onSuccess,
 }) {
   try {
+    // Truyền weights trực tiếp vào body request
     const response = await apiHelper.post(
       apiUrls.rematchCVs(projectId, positionId),
-      {
-        weight: weights,
-      }
+      weights  // Truyền trực tiếp đối tượng weights vào API
     );
 
     if (response.msg) {
@@ -206,3 +205,4 @@ export async function rematchCVDataApi({
     onFail("Lỗi khi gửi yêu cầu rematch");
   }
 }
+

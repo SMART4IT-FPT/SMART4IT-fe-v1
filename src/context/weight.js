@@ -4,14 +4,14 @@ import { persist } from "zustand/middleware";
 const useWeightState = create(
   persist(
     (set) => ({
-      weights: null,  // Ban đầu weights là null
+      weights: null,  
       setWeights: (weights) => {
-        console.log("Setting weights:", weights); // Log trước khi set
+        console.log("Setting weights:", weights); 
         set({ weights });
       },
     }),
     {
-      name: "weights-storage", // Tên key lưu trữ trong localStorage
+      name: "weights-storage", 
     }
   )
 );
