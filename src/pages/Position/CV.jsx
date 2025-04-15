@@ -43,6 +43,7 @@ import {
   getCVsApi,
   uploadCVDataApi,
   watchUploadProgressApi,
+  rematchCVDataApi,
 } from "../../apis/cv";
 import usePositionsState from "../../context/position";
 import useCVState from "../../context/cv";
@@ -86,6 +87,8 @@ export default function CVPage() {
   const [sortOrder, setSortOrder] = useState("desc"); // "asc" | "desc"
   const [labelFilter, setLabelFilter] = useState(null);
   const weights = useWeightState((state) => state.weights); // Đảm bảo weights đã được lấy từ context
+  const [isRematching, setIsRematching] = useState(false); // cho Rematch riêng
+
 
 
   const columns = [
@@ -98,6 +101,10 @@ export default function CVPage() {
       label: appStrings.language.cv.tableUploadDate,
     },
     {
+      key: "label",
+      label: "Label",
+    },
+    {
       key: "componentScores",
       label: "Component Scores",
     },
@@ -105,7 +112,7 @@ export default function CVPage() {
       key: "overallScore",
       label: (
         <Flex align="center" gap={4}>
-          <Text>Overall Score</Text>
+          <Text style={{ fontWeight: "bold" }}>Overall Score</Text>
           <Tooltip label={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`} withArrow>
             <ActionIcon
               variant="subtle"
@@ -129,10 +136,6 @@ export default function CVPage() {
           </Tooltip>
         </Flex>
       ),
-    },
-    {
-      key: "label",
-      label: "Label",
     },
     {
       key: "actions",
@@ -179,14 +182,15 @@ export default function CVPage() {
       console.error("Trọng số chưa được lưu!");
       return;
     }
-  
+
     setUploadFiles(files);
-    console.log("Đang upload CV với trọng số:", weights);  // Log weights trước khi gửi API
+    console.log("Đang upload CV với trọng số:", weights);
+
     uploadCVDataApi({
       projectId,
       positionId,
       files,
-      weights: JSON.stringify(weights),  // Truyền trọng số đã được cập nhật
+      weights,
       onFail: (msg) => {
         errorNotify({ message: msg });
         setUploadFiles(null);
@@ -197,6 +201,8 @@ export default function CVPage() {
           initProgressObject[file.name] = 0;
         });
         setProgressObject(initProgressObject);
+
+        // Giới hạn cập nhật trạng thái để tránh log liên tục
         intervalFunction({
           callback: (stop) => {
             if (!isUploading) {
@@ -222,11 +228,8 @@ export default function CVPage() {
       },
     });
   }
-  
-  
-  
-  
-  
+
+
 
   async function handleMatchCVJD() {
     if (!search.length) {
@@ -286,6 +289,50 @@ export default function CVPage() {
     }
   }
 
+  async function handleRematchCVs() {
+    if (!weights) {
+      errorNotify({ message: "Vui lòng cấu hình trọng số trước." });
+      return;
+    }
+  
+    setIsRematching(true); // 👈 dùng riêng
+  
+    await rematchCVDataApi({
+      projectId,
+      positionId,
+      weights,
+      onFail: (msg) => {
+        errorNotify({ message: msg });
+        setIsRematching(false); // 👈
+      },
+      onSuccess: (result) => {
+        successNotify({
+          title: "Cập nhật điểm thành công!",
+          message: "Tất cả CV đã được rematch lại.",
+        });
+  
+        getCVsApi({
+          projectId,
+          positionId,
+          onFail: () => setCVs([]),
+          onSuccess: (cvs) => {
+            const formatedCVs = cvs.map((cv) => ({
+              id: cv.id,
+              cvName: cv.name,
+              upload: cv.upload_at,
+              labels: (cv.labels || []).map((l) => l.toLowerCase()),
+            }));
+            setCVs(formatedCVs);
+          },
+        });
+  
+        setIsRematching(false); // 👈
+      },
+    });
+  }
+  
+
+
   function handleDeleteCV(id) {
     deleteCVDataApi({
       projectId,
@@ -309,6 +356,8 @@ export default function CVPage() {
   });
 
   useEffect(() => {
+    if (!projectId || !positionId) return;
+
     getCVsApi({
       projectId,
       positionId,
@@ -317,6 +366,7 @@ export default function CVPage() {
         setCVs([]);
       },
       onSuccess: (cvs) => {
+        if (cvs.length === 0) return;
         const formatedCVs = cvs.map((cv) => ({
           id: cv.id,
           cvName: cv.name,
@@ -326,7 +376,7 @@ export default function CVPage() {
         setCVs(formatedCVs);
       },
     });
-  }, [setCVs]);
+  }, [projectId, positionId]);
 
   return (
     <Flex direction="column" gap="md">
@@ -447,6 +497,16 @@ export default function CVPage() {
           onChange={setLabelFilter}
           style={{ width: 220 }}
         />
+        <Button
+          leftSection={<IconSparkles size="1rem" />}
+          variant="outline"
+          color="blue"
+          onClick={handleRematchCVs}
+          loading={isRematching}
+          disabled={isUploading}
+        >
+          Rematch
+        </Button>
 
         <Button
           leftSection={<IconSparkles size="1rem" />}
@@ -466,7 +526,7 @@ export default function CVPage() {
             return (cv.labels || []).some(
               (lb) => lb.toLowerCase().replace(/ /g, "_") === labelFilter.toLowerCase()
             );
-          })          
+          })
           .sort((a, b) => {
             const scoreA = cvScores[a.id]?.overallScore || 0;
             const scoreB = cvScores[b.id]?.overallScore || 0;

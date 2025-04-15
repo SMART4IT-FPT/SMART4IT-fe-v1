@@ -4,7 +4,6 @@ import {
   ActionIcon,
   Text,
   Menu,
-  Skeleton,
   Badge,
   NumberInput,
   Divider,
@@ -130,9 +129,9 @@ export default function PositionGeneralPage() {
   }, [position]);
 
   useEffect(() => {
-    console.log("Updating weights:", cvWeights);  // Log trước khi cập nhật
     setWeights(cvWeights);  // Cập nhật weights trong context
   }, [cvWeights, setWeights]);  // Cập nhật khi cvWeights thay đổi
+  
   
 
   const renderMainWeightInput = (label, value, onChange, modalKey) => (
