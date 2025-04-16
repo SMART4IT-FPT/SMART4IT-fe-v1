@@ -171,3 +171,32 @@ export async function getPublicPositionApi({ positionId, onFail, onSuccess }) {
     onFail(response.detail);
   }
 }
+
+export async function downloadCvsSummaryListApi({
+  projectId,
+  positionId,
+  onFail,
+  onSuccess,
+}) {
+  try {
+    const response = await apiHelper.get(
+      apiUrls.downloadCvs(projectId, positionId),
+      { responseType: 'blob' } // Add this to handle binary data
+    );
+
+    // Create a Blob object from the response data
+    const fileBlob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // Create a link element to trigger the file download
+    const downloadLink = document.createElement('a');
+    const url = window.URL.createObjectURL(fileBlob);
+    downloadLink.href = url;
+    downloadLink.download = 'CV_summary_list.xlsx'; // You can set a custom name for the file
+    downloadLink.click();
+    onSuccess(); // Handle the success callback
+  } catch (error) {
+    console.error("Error downloading CV summary list:", error);
+    onFail("Error downloading CV summary list.");
+  }
+}
+

@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { Menu } from "@mantine/core";
-import { IconTrash, IconArchive, IconArchiveOff } from "@tabler/icons-react";
+import { Menu, Button } from "@mantine/core"; // Đảm bảo rằng Menu được sử dụng chính xác
+import { IconTrash, IconArchive, IconArchiveOff, IconDownload } from "@tabler/icons-react"; // Import IconDownload
 import appStrings from "../../utils/strings";
 
 export default function PositionAction({
@@ -8,6 +8,7 @@ export default function PositionAction({
   onCloseTap,
   onOpenTap,
   onDeleteTap,
+  onDownloadTap, // Thêm prop onDownloadTap để nhận hành động tải xuống
 }) {
   return (
     <Fragment>
@@ -25,6 +26,12 @@ export default function PositionAction({
         onClick={onDeleteTap}
       >
         {appStrings.language.btn.delete}
+      </Menu.Item>
+      <Menu.Item
+        leftSection={<IconDownload size="1rem" />}
+        onClick={onDownloadTap} 
+      >
+        {appStrings.language.position.downloadSummary}
       </Menu.Item>
     </Fragment>
   );

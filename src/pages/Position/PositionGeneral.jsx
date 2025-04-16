@@ -129,8 +129,8 @@ export default function PositionGeneralPage() {
   }, [position]);
 
   useEffect(() => {
-    setWeights(cvWeights);  // Cập nhật weights trong context
-  }, [cvWeights, setWeights]);  // Cập nhật khi cvWeights thay đổi
+    setWeights(cvWeights);  
+  }, [cvWeights, setWeights]);
   
   
 
@@ -200,7 +200,7 @@ export default function PositionGeneralPage() {
             rightSection={<IconCalendarEvent />}
             valueFormat="DD/MM/YYYY"
             label={appStrings.language.positionDetail.startDateLabel}
-            placeholder="3/26/2024"
+            placeholder="3/26/2025"
             size="sm"
             value={form.startDate}
             onChange={handleStartDateChange}
@@ -211,7 +211,7 @@ export default function PositionGeneralPage() {
             rightSection={<IconCalendarEvent />}
             valueFormat="DD/MM/YYYY"
             label={appStrings.language.positionDetail.endDateLabel}
-            placeholder="3/26/2025"
+            placeholder="3/26/2026"
             size="sm"
             value={form.endDate}
             onChange={handleEndDateChange}
@@ -220,37 +220,47 @@ export default function PositionGeneralPage() {
           />
         </Flex>
 
-        <Divider my="md" label="Weight Configuration" labelPosition="left" />
+        <Divider my="md" label={appStrings.language.positionDetail.weightConfigureLabel} labelPosition="left" />
 
         <Paper withBorder shadow="xs" p="md" radius="md">
           <Group gap="lg" wrap="wrap">
-            {renderMainWeightInput("Education", cvWeights.education_score_config.W_education_score, (val) => setCvWeights((prev) => ({ ...prev, education_score_config: { ...prev.education_score_config, W_education_score: val } })))}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.education}</label>, 
+              cvWeights.education_score_config.W_education_score, (val) => setCvWeights((prev) => ({ ...prev, education_score_config: { ...prev.education_score_config, W_education_score: val } })))}
 
-            {renderMainWeightInput("Language", cvWeights.language_skills_score_config.W_language_skills_score, (val) => setCvWeights((prev) => ({ ...prev, language_skills_score_config: { ...prev.language_skills_score_config, W_language_skills_score: val } })))}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.language}</label>, 
+              cvWeights.language_skills_score_config.W_language_skills_score, (val) => setCvWeights((prev) => ({ ...prev, language_skills_score_config: { ...prev.language_skills_score_config, W_language_skills_score: val } })))}
 
-            {renderMainWeightInput("Technical", cvWeights.technical_skills_score_config.W_technical_skills_score, (val) => setCvWeights((prev) => ({ ...prev, technical_skills_score_config: { ...prev.technical_skills_score_config, W_technical_skills_score: val } })))}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.technical}</label>, 
+              cvWeights.technical_skills_score_config.W_technical_skills_score, (val) => setCvWeights((prev) => ({ ...prev, technical_skills_score_config: { ...prev.technical_skills_score_config, W_technical_skills_score: val } })))}
 
-            {renderMainWeightInput("Experience", cvWeights.work_experience_score_config.W_work_experience_score, (val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, W_work_experience_score: val } })), "experience")}
-
-            {renderMainWeightInput("Projects", cvWeights.personal_projects_score_config.W_personal_projects_score, (val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, W_personal_projects_score: val } })), "projects")}
-
-            {renderMainWeightInput("Publications", cvWeights.publications_score_config.W_publications_score, (val) => setCvWeights((prev) => ({ ...prev, publications_score_config: { ...prev.publications_score_config, W_publications_score: val } })))}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.experience}</label>,
+              cvWeights.work_experience_score_config.W_work_experience_score, (val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, W_work_experience_score: val } })), "experience")}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.personalProject}</label>,
+               cvWeights.personal_projects_score_config.W_personal_projects_score, (val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, W_personal_projects_score: val } })), "projects")}
+            {renderMainWeightInput(
+              <label>{appStrings.language.positionDetail.publication}</label>,
+              cvWeights.publications_score_config.W_publications_score, (val) => setCvWeights((prev) => ({ ...prev, publications_score_config: { ...prev.publications_score_config, W_publications_score: val } })))}
           </Group>
         </Paper>
 
-        <Modal title="Work Experience Details" opened={openedModal === "experience"} onClose={() => setOpenedModal(null)}>
+        <Modal title={appStrings.language.positionDetail.workExperienceDetail} opened={openedModal === "experience"} onClose={() => setOpenedModal(null)}>
           <Flex direction="column" gap="sm">
-            <NumberInput label="Relevance" value={cvWeights.work_experience_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label="Duration" value={cvWeights.work_experience_score_config.duration_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, duration_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label="Responsibilities" value={cvWeights.work_experience_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.relevan} value={cvWeights.work_experience_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.duration} value={cvWeights.work_experience_score_config.duration_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, duration_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.responsibilities} value={cvWeights.work_experience_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
           </Flex>
         </Modal>
 
-        <Modal title="Personal Projects Details" opened={openedModal === "projects"} onClose={() => setOpenedModal(null)}>
+        <Modal title={appStrings.language.positionDetail.personalProjectDetail} opened={openedModal === "projects"} onClose={() => setOpenedModal(null)}>
           <Flex direction="column" gap="sm">
-            <NumberInput label="Relevance" value={cvWeights.personal_projects_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label="Technologies" value={cvWeights.personal_projects_score_config.technologies_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, technologies_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label="Responsibilities" value={cvWeights.personal_projects_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.relevan} value={cvWeights.personal_projects_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.technologies} value={cvWeights.personal_projects_score_config.technologies_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, technologies_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput label={appStrings.language.positionDetail.responsibilities} value={cvWeights.personal_projects_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
           </Flex>
         </Modal>
       </Flex>

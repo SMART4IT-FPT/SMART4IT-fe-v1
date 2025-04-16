@@ -18,6 +18,7 @@ import {
   deletePositionApi,
   getPositionsApi,
   openPositionApi,
+  downloadCvsSummaryListApi,
 } from "../../apis/positions";
 import { formatDate } from "../../utils/utils";
 import useConfirmModal from "../../hooks/useConfirmModal";
@@ -160,6 +161,18 @@ export default function YourPositionPage() {
       });
     }
   }, [setPositions]);
+  function handleDownloadSummary(positionId) {
+    downloadCvsSummaryListApi({
+      projectId,
+      positionId,
+      onFail: (msg) => errorNotify({ message: msg }),
+      onSuccess: (data) => {
+        successNotify({
+          message: appStrings.language.position.downloadSuccessMessage,
+        });
+      },
+    });
+  }
 
   return (
     <Flex direction="column" gap="md">
@@ -199,6 +212,7 @@ export default function YourPositionPage() {
                 <PositionAction
                   onCloseTap={() => handleClosePosition(data.id)}
                   onDeleteTap={() => deletePositionTrigger(data.id)}
+                  onDownloadTap={() => handleDownloadSummary(data.id)}
                 />
               }
             />
@@ -226,6 +240,7 @@ export default function YourPositionPage() {
                   isClose
                   onOpenTap={() => handleOpenPosition(data.id)}
                   onDeleteTap={() => deletePositionTrigger(data.id)}
+                  onDownloadTap={() => handleDownloadSummary(data.id)}
                 />
               }
             />
