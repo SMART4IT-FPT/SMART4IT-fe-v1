@@ -179,24 +179,33 @@ export async function downloadCvsSummaryListApi({
   onSuccess,
 }) {
   try {
-    const response = await apiHelper.get(
-      apiUrls.downloadCvs(projectId, positionId),
-      { responseType: 'blob' } // Add this to handle binary data
+    const response = await apiHelper.getBlob(
+      apiUrls.downloadCvs(projectId, positionId)
     );
+    
 
-    // Create a Blob object from the response data
-    const fileBlob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    // ✅ Kiểm tra đúng loại blob
+    if (!(response?.data instanceof Blob)) {
+      const text = await response?.data?.text?.() || "[Không có dữ liệu]";
+      throw new Error("Dữ liệu không hợp lệ. Nội dung: " + text);
+    }
 
-    // Create a link element to trigger the file download
-    const downloadLink = document.createElement('a');
-    const url = window.URL.createObjectURL(fileBlob);
-    downloadLink.href = url;
-    downloadLink.download = 'CV_summary_list.xlsx'; // You can set a custom name for the file
-    downloadLink.click();
-    onSuccess(); // Handle the success callback
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "CV_summary_list.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    onSuccess?.();
   } catch (error) {
     console.error("Error downloading CV summary list:", error);
-    onFail("Error downloading CV summary list.");
+    onFail?.("Lỗi khi tải file CV summary: " + error.message);
   }
 }
+
+
+
 
