@@ -27,6 +27,18 @@ const apiHelper = {
       return formatErrorResponse(error);
     }
   },
+  getBlob: async (url, config = {}) => {
+    try {
+      const response = await api.get(url, {
+        ...config,
+        responseType: "blob", // ⚠️ bắt buộc
+      });
+      return response;
+    } catch (error) {
+      return formatErrorResponse(error);
+    }
+  },
+  
 
   post: async (url, data = {}, config = {}) => {
     try {
