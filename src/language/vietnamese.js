@@ -139,6 +139,9 @@ const vietnamese = {
     responsibilities: "Trách nhiệm",
     personalProjectDetail: "Chi tiết dự án cá nhân",
     technologies: "Công nghệ",
+    selectLLM: "Chọn mô hình LLM để phân tích JD và CV",
+    selectWeight: "Chọn trọng số cho từng tiêu chí",
+
   },
   cv: {
     title: "CVs",
@@ -183,6 +186,10 @@ const vietnamese = {
     personalProjectScore: "Điểm dự án cá nhân",
     publicationScore: "Điểm công bố",
     filter: "Lọc theo nhãn",
+    uploadAsc: "Ngày tải lên ↑",
+    uploadDesc: "Ngày tải lên ↓",
+    filterOverall: "Lọc CV theo điểm tổng",
+    sort: "Sắp xếp theo",
   },
   jd: {
     title: "JD",

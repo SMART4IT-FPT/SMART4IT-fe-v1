@@ -22,18 +22,19 @@ export async function uploadJDApi({
   projectId,
   positionId,
   content,
+  llmName,
   onFail,
   onSuccess,
 }) {
-  // Send post request
   const data = {
     content: content,
   };
-  const response = await apiHelper.put(
-    apiUrls.uploadJD(projectId, positionId),
-    data
-  );
-  // Handle response
+
+  // 👇 Đưa llm_name vào query
+  const url = `${apiUrls.uploadJD(projectId, positionId)}?llm_name=${encodeURIComponent(llmName)}`;
+
+  const response = await apiHelper.put(url, data);
+
   if (response.msg) {
     console.log(response.msg);
     onSuccess(response.data);
@@ -41,3 +42,5 @@ export async function uploadJDApi({
     onFail(response.detail);
   }
 }
+
+

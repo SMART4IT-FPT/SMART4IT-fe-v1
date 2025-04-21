@@ -141,7 +141,9 @@ const english = {
     duration: "Duration",
     responsibilities: "Responsibilities",
     personalProjectDetail: "Personal Project Detail",
-    technologies: "Technologies",   
+    technologies: "Technologies",
+    selectLLM: "Select LLM model for JD and CV analysis",
+    selectWeight: "Select weight for each criteria",
   },
   cv: {
     title: "CVs",
@@ -186,6 +188,10 @@ const english = {
     personalProjectScore: "Personal Project Score",
     publicationScore: "Publication Score",
     filter: "Filter by labels",
+    uploadAsc: "Upload Date ↑",
+    uploadDesc: "Upload Date ↓",
+    filterOverall: "Filter CVs by overall score",
+    sort: "Sort by",
   },
   jd: {
     title: "JD",

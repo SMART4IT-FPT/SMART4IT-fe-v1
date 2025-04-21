@@ -11,6 +11,7 @@ import {
   Paper,
   ScrollArea,
   Modal,
+  Select,
 } from "@mantine/core";
 import { IconDots, IconCalendarEvent, IconSettings } from "@tabler/icons-react";
 import { DateInput } from "@mantine/dates";
@@ -21,7 +22,7 @@ import appStrings from "../../utils/strings";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import usePositionsState from "../../context/position";
-import useWeightState from "../../context/weight"; // ✅ NEW: to sync weight globally
+import useWeightState from "../../context/weight";
 import {
   closePositionApi,
   deletePositionApi,
@@ -37,7 +38,9 @@ export default function PositionGeneralPage() {
   const projectId = location.pathname.split("/")[1];
   const positionId = location.pathname.split("/")[2];
   const position = usePositionsState((state) => state.position);
-  const setWeights = useWeightState((state) => state.setWeights); // Lấy setWeights từ context
+  const setWeights = useWeightState((state) => state.setWeights);
+  const llmName = useWeightState((state) => state.llmName);
+  const setLlmName = useWeightState((state) => state.setLlmName);
 
 
   const [form, setForm] = useState({ startDate: null, endDate: null });
@@ -60,6 +63,14 @@ export default function PositionGeneralPage() {
     },
     publications_score_config: { W_publications_score: 0.05 },
   });
+  const availableLLMs = [
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gpt-4o-mini",
+    "gpt-4o"
+  ];
+
 
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
@@ -125,14 +136,25 @@ export default function PositionGeneralPage() {
         startDate: new Date(position.start_date),
         endDate: new Date(position.end_date),
       });
+
+      // nếu đã có weight trong zustand => dùng lại
+      const zustandWeights = useWeightState.getState().weights;
+      if (zustandWeights) {
+        setCvWeights(zustandWeights);
+      }
     }
   }, [position]);
 
-  useEffect(() => {
-    setWeights(cvWeights);  
-  }, [cvWeights, setWeights]);
-  
-  
+
+
+  const setCvWeightsAndSync = (updaterFn) => {
+    setCvWeights((prev) => {
+      const updated = updaterFn(prev);
+      setWeights(updated); // cập nhật vào zustand luôn
+      return updated;
+    });
+  };
+
 
   const renderMainWeightInput = (label, value, onChange, modalKey) => (
     <NumberInput
@@ -221,32 +243,121 @@ export default function PositionGeneralPage() {
         </Flex>
 
         <Divider my="md" label={appStrings.language.positionDetail.weightConfigureLabel} labelPosition="left" />
+        <Paper withBorder shadow="xs" p="md" radius="md" mb="md">
+          <Flex direction="column" gap="sm">
+            <Text fw={600}>{appStrings.language.positionDetail.selectLLM}</Text>
+            <Select
+              placeholder="Chọn mô hình AI"
+              data={[
+                { value: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+                { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
+                { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro" },
+                { value: "gpt-4o-mini", label: "GPT-4o Mini" },
+                { value: "gpt-4o", label: "GPT-4o" },
+              ]}
+              value={llmName}
+              onChange={(val) => setLlmName(val)}
+              nothingFound="Không có mô hình nào"
+              searchable
+              clearable={false}
+              size="sm"
+              radius="md"
+              styles={{
+                input: { fontWeight: 500 },
+              }}
+            />
+          </Flex>
+        </Paper>
+
 
         <Paper withBorder shadow="xs" p="md" radius="md">
+        <Flex direction="column" gap="sm">
+
+          <Text fw={600}>{appStrings.language.positionDetail.selectWeight}</Text>
           <Group gap="lg" wrap="wrap">
             {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.education}</label>, 
-              cvWeights.education_score_config.W_education_score, (val) => setCvWeights((prev) => ({ ...prev, education_score_config: { ...prev.education_score_config, W_education_score: val } })))}
+              <label>{appStrings.language.positionDetail.education}</label>,
+              cvWeights.education_score_config.W_education_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  education_score_config: {
+                    ...prev.education_score_config,
+                    W_education_score: val,
+                  },
+                }))
+            )}
 
             {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.language}</label>, 
-              cvWeights.language_skills_score_config.W_language_skills_score, (val) => setCvWeights((prev) => ({ ...prev, language_skills_score_config: { ...prev.language_skills_score_config, W_language_skills_score: val } })))}
+              <label>{appStrings.language.positionDetail.language}</label>,
+              cvWeights.language_skills_score_config.W_language_skills_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  language_skills_score_config: {
+                    ...prev.language_skills_score_config,
+                    W_language_skills_score: val,
+                  },
+                }))
+            )}
 
             {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.technical}</label>, 
-              cvWeights.technical_skills_score_config.W_technical_skills_score, (val) => setCvWeights((prev) => ({ ...prev, technical_skills_score_config: { ...prev.technical_skills_score_config, W_technical_skills_score: val } })))}
+              <label>{appStrings.language.positionDetail.technical}</label>,
+              cvWeights.technical_skills_score_config.W_technical_skills_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  technical_skills_score_config: {
+                    ...prev.technical_skills_score_config,
+                    W_technical_skills_score: val,
+                  },
+                }))
+            )}
 
             {renderMainWeightInput(
               <label>{appStrings.language.positionDetail.experience}</label>,
-              cvWeights.work_experience_score_config.W_work_experience_score, (val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, W_work_experience_score: val } })), "experience")}
+              cvWeights.work_experience_score_config.W_work_experience_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  work_experience_score_config: {
+                    ...prev.work_experience_score_config,
+                    W_work_experience_score: val,
+                  },
+                })),
+              "experience"
+            )}
+
             {renderMainWeightInput(
               <label>{appStrings.language.positionDetail.personalProject}</label>,
-               cvWeights.personal_projects_score_config.W_personal_projects_score, (val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, W_personal_projects_score: val } })), "projects")}
+              cvWeights.personal_projects_score_config.W_personal_projects_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  personal_projects_score_config: {
+                    ...prev.personal_projects_score_config,
+                    W_personal_projects_score: val,
+                  },
+                })),
+              "projects"
+            )}
+
             {renderMainWeightInput(
               <label>{appStrings.language.positionDetail.publication}</label>,
-              cvWeights.publications_score_config.W_publications_score, (val) => setCvWeights((prev) => ({ ...prev, publications_score_config: { ...prev.publications_score_config, W_publications_score: val } })))}
+              cvWeights.publications_score_config.W_publications_score,
+              (val) =>
+                setCvWeightsAndSync((prev) => ({
+                  ...prev,
+                  publications_score_config: {
+                    ...prev.publications_score_config,
+                    W_publications_score: val,
+                  },
+                }))
+            )}
           </Group>
+        </Flex>
         </Paper>
+
 
         <Modal title={appStrings.language.positionDetail.workExperienceDetail} opened={openedModal === "experience"} onClose={() => setOpenedModal(null)}>
           <Flex direction="column" gap="sm">

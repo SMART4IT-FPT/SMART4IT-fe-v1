@@ -139,6 +139,8 @@ const french = {
     responsibilities: "Responsabilités",
     personalProjectDetail: "Détails du projet personnel",
     technologies: "Technologies",
+    selectLLM: "Sélectionner le modèle LLM pour l'analyse JD et CV",
+    selectWeight: "Sélectionner le poids pour chaque critère",
   },
   cv: {
     title: "CVs",
@@ -183,6 +185,10 @@ const french = {
     personalProjectScore: "Score de projet personnel",
     publicationScore: "Score de publication",
     filter: "Filtrer par étiquettes",
+    uploadAsc: "Date de téléchargement ↑",
+    uploadDesc: "Date de téléchargement ↓",
+    filterOverall: "Filtrer les CVs par score global",
+    sort: "Trier par",
   },
   jd: {
     title: "JD",
