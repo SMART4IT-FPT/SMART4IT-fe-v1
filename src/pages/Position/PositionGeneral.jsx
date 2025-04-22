@@ -27,6 +27,7 @@ import {
   closePositionApi,
   deletePositionApi,
   openPositionApi,
+  downloadCvsSummaryListApi,
 } from "../../apis/positions";
 import useNotification from "../../hooks/useNotification";
 import useConfirmModal from "../../hooks/useConfirmModal";
@@ -110,6 +111,20 @@ export default function PositionGeneralPage() {
       },
     });
   }
+  
+  function handleDownloadSummary(positionId) {
+    downloadCvsSummaryListApi({
+      projectId,
+      positionId,
+      onFail: (msg) => errorNotify({ message: msg }),
+      onSuccess: () => {
+        successNotify({
+          message: appStrings.language.position.downloadSuccessMessage,
+        });
+      },
+    });
+  }
+
 
   function handleDeletePosition() {
     deletePositionApi({
@@ -124,6 +139,8 @@ export default function PositionGeneralPage() {
       },
     });
   }
+
+
 
   const deletePositionTrigger = useConfirmModal({
     type: "delete",
@@ -210,6 +227,7 @@ export default function PositionGeneralPage() {
                 onDeleteTap={deletePositionTrigger}
                 onCloseTap={handleClosePosition}
                 onOpenTap={handleOpenPosition}
+                onDownloadTap={() => handleDownloadSummary(positionId)}
               />
             </Menu.Dropdown>
           </Menu>
@@ -271,91 +289,91 @@ export default function PositionGeneralPage() {
 
 
         <Paper withBorder shadow="xs" p="md" radius="md">
-        <Flex direction="column" gap="sm">
+          <Flex direction="column" gap="sm">
 
-          <Text fw={600}>{appStrings.language.positionDetail.selectWeight}</Text>
-          <Group gap="lg" wrap="wrap">
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.education}</label>,
-              cvWeights.education_score_config.W_education_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  education_score_config: {
-                    ...prev.education_score_config,
-                    W_education_score: val,
-                  },
-                }))
-            )}
+            <Text fw={600}>{appStrings.language.positionDetail.selectWeight}</Text>
+            <Group gap="lg" wrap="wrap">
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.education}</label>,
+                cvWeights.education_score_config.W_education_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    education_score_config: {
+                      ...prev.education_score_config,
+                      W_education_score: val,
+                    },
+                  }))
+              )}
 
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.language}</label>,
-              cvWeights.language_skills_score_config.W_language_skills_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  language_skills_score_config: {
-                    ...prev.language_skills_score_config,
-                    W_language_skills_score: val,
-                  },
-                }))
-            )}
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.language}</label>,
+                cvWeights.language_skills_score_config.W_language_skills_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    language_skills_score_config: {
+                      ...prev.language_skills_score_config,
+                      W_language_skills_score: val,
+                    },
+                  }))
+              )}
 
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.technical}</label>,
-              cvWeights.technical_skills_score_config.W_technical_skills_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  technical_skills_score_config: {
-                    ...prev.technical_skills_score_config,
-                    W_technical_skills_score: val,
-                  },
-                }))
-            )}
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.technical}</label>,
+                cvWeights.technical_skills_score_config.W_technical_skills_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    technical_skills_score_config: {
+                      ...prev.technical_skills_score_config,
+                      W_technical_skills_score: val,
+                    },
+                  }))
+              )}
 
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.experience}</label>,
-              cvWeights.work_experience_score_config.W_work_experience_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  work_experience_score_config: {
-                    ...prev.work_experience_score_config,
-                    W_work_experience_score: val,
-                  },
-                })),
-              "experience"
-            )}
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.experience}</label>,
+                cvWeights.work_experience_score_config.W_work_experience_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    work_experience_score_config: {
+                      ...prev.work_experience_score_config,
+                      W_work_experience_score: val,
+                    },
+                  })),
+                "experience"
+              )}
 
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.personalProject}</label>,
-              cvWeights.personal_projects_score_config.W_personal_projects_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  personal_projects_score_config: {
-                    ...prev.personal_projects_score_config,
-                    W_personal_projects_score: val,
-                  },
-                })),
-              "projects"
-            )}
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.personalProject}</label>,
+                cvWeights.personal_projects_score_config.W_personal_projects_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    personal_projects_score_config: {
+                      ...prev.personal_projects_score_config,
+                      W_personal_projects_score: val,
+                    },
+                  })),
+                "projects"
+              )}
 
-            {renderMainWeightInput(
-              <label>{appStrings.language.positionDetail.publication}</label>,
-              cvWeights.publications_score_config.W_publications_score,
-              (val) =>
-                setCvWeightsAndSync((prev) => ({
-                  ...prev,
-                  publications_score_config: {
-                    ...prev.publications_score_config,
-                    W_publications_score: val,
-                  },
-                }))
-            )}
-          </Group>
-        </Flex>
+              {renderMainWeightInput(
+                <label>{appStrings.language.positionDetail.publication}</label>,
+                cvWeights.publications_score_config.W_publications_score,
+                (val) =>
+                  setCvWeightsAndSync((prev) => ({
+                    ...prev,
+                    publications_score_config: {
+                      ...prev.publications_score_config,
+                      W_publications_score: val,
+                    },
+                  }))
+              )}
+            </Group>
+          </Flex>
         </Paper>
 
 

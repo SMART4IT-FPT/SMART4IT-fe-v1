@@ -51,7 +51,6 @@ import useCVState from "../../context/cv";
 import useNotification from "../../hooks/useNotification";
 import {
   formatDate,
-  getShareUploadUrl,
 } from "../../utils/utils";
 import useInterval from "../../hooks/useInterval";
 import useSearch from "../../hooks/useSearch";
@@ -208,18 +207,45 @@ export default function CVPage() {
             }
             watchUploadProgressApi(data.progress_id).then((progressData) => {
               if (progressData?.percent) {
-                setProgressObject((prev) => ({
-                  ...prev,
-                  ...progressData?.percent,
-                }));
-              }
-              if (_isProgressComplete(progressData?.percent)) {
-                stop();
-                setIsUploading(false);
-                successNotify({
-                  message: appStrings.language.cv.uploadSuccessMessage,
+                setProgressObject((prev) => {
+                  const updated = { ...prev };
+              
+                  Object.keys(prev).forEach((fileName) => {
+                    const newPercent = progressData.percent[fileName];
+                    updated[fileName] = newPercent !== undefined ? newPercent : prev[fileName];
+                  });
+              
+                  // ✅ Kiểm tra đúng status từ BE
+                  if (progressData.status === "completed") {
+                    stop();                    // Dừng interval khi BE báo completed
+                    setIsUploading(false);
+                    setProgressObject({});      // Reset progress
+              
+                    successNotify({
+                      message: appStrings.language.cv.uploadSuccessMessage,
+                    });
+              
+                    setTimeout(() => {
+                      getCVsApi({
+                        projectId,
+                        positionId,
+                        onFail: () => setCVs([]),
+                        onSuccess: (cvs) => {
+                          const formatedCVs = cvs.map((cv) => ({
+                            id: cv.id,
+                            cvName: cv.name,
+                            upload: cv.upload_at,
+                            labels: (cv.labels || []).map((l) => l.toLowerCase()),
+                          }));
+                          setCVs(formatedCVs);
+                        },
+                      });
+                    }, 1000);
+                  }
+              
+                  return updated;
                 });
-              }
+              }                          
             });
           },
         });
@@ -290,8 +316,6 @@ export default function CVPage() {
       errorNotify({ message: appStrings.language.cv.configureWeightMessage });
       return;
     }
-    console.log("Trọng số (weights) hiện tại:", weights);
-
     setIsRematching(true);
 
     // Gửi request rematch tới API, truyền weights trực tiếp mà không bọc trong 'weight'
@@ -434,7 +458,7 @@ export default function CVPage() {
                 value={sortField}
                 onChange={setSortField}
                 data={[
-                  { value: "overall", label: appStrings.language.cv.tableOverallScore},
+                  { value: "overall", label: appStrings.language.cv.tableOverallScore },
                   { value: "education", label: appStrings.language.cv.educationScore },
                   { value: "technical", label: appStrings.language.cv.technicalScore },
                   { value: "experience", label: appStrings.language.cv.experienceScore },
@@ -496,14 +520,14 @@ export default function CVPage() {
         data={(Array.isArray(search) ? [...search] : [])
           .filter((cv) => {
             const score = cvScores[cv.id]?.overallScore || 0;
-          
+
             const labelMatch =
               !labelFilter ||
               (cv.labels || []).some(
                 (lb) =>
                   lb.toLowerCase().replace(/ /g, "_") === labelFilter.toLowerCase()
               );
-          
+
             return score >= scoreThreshold && labelMatch;
           })
           .sort((a, b) => {
@@ -526,10 +550,10 @@ export default function CVPage() {
                   return s.overallScore || 0;
               }
             };
-          
+
             const sortValA = getScore(a, sortField);
             const sortValB = getScore(b, sortField);
-          
+
             // Đảo ngược nếu là upload_asc hoặc upload_desc (đã có dấu âm sẵn)
             if (sortField.startsWith("upload")) return sortValA - sortValB;
             return sortOrder === "asc" ? sortValA - sortValB : sortValB - sortValA;
@@ -537,7 +561,7 @@ export default function CVPage() {
           .map((data) => {
             const scores = cvScores[data.id] || {};
             const label = data.label || "No Label";
-          
+
             const educationScore = scores.educationScore || 0;
             const languageScore = scores.languageScore || 0;
             const technicalScore = scores.technicalScore || 0;
@@ -545,7 +569,7 @@ export default function CVPage() {
             const overallScore = scores.overallScore || 0;
             const personalProjectsScore = scores.personalProjectsScore || 0;
             const publicationsScore = scores.publicationsScore || 0;
-          
+
             return {
               cvName: (
                 <Flex align="center" gap="md">

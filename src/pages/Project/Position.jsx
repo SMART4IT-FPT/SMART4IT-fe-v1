@@ -212,8 +212,8 @@ export default function YourPositionPage() {
                 <PositionAction
                   onCloseTap={() => handleClosePosition(data.id)}
                   onDeleteTap={() => deletePositionTrigger(data.id)}
-                  onDownloadTap={() => handleDownloadSummary(data.id)}
-                />
+                  onDownloadTap={() => handleDownloadSummary(position?.id)}
+                  />
               }
             />
           ))}
