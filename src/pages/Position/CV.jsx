@@ -14,6 +14,7 @@ import {
   Popover,
   Slider,
   Select,
+  Divider,
 } from "@mantine/core";
 import {
   IconTrash,
@@ -50,7 +51,6 @@ import useCVState from "../../context/cv";
 import useNotification from "../../hooks/useNotification";
 import {
   formatDate,
-  getShareUploadUrl,
 } from "../../utils/utils";
 import useInterval from "../../hooks/useInterval";
 import useSearch from "../../hooks/useSearch";
@@ -84,10 +84,11 @@ export default function CVPage() {
   const setCVs = useCVState((state) => state.setCVs);
   const uploadFiles = useCVState((state) => state.uploadFiles);
   const setUploadFiles = useCVState((state) => state.setUploadFiles);
-  const [sortOrder, setSortOrder] = useState("desc"); 
+  const [sortOrder, setSortOrder] = useState("desc");
   const [labelFilter, setLabelFilter] = useState(null);
-  const weights = useWeightState((state) => state.weights); 
-  const [isRematching, setIsRematching] = useState(false); 
+  const weights = useWeightState((state) => state.weights);
+  const llmName = useWeightState((state) => state.llmName);
+  const [isRematching, setIsRematching] = useState(false);
 
 
 
@@ -146,12 +147,11 @@ export default function CVPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
   const [progressObject, setProgressObject] = useState({});
-  const [adjustment, setAdjustment] = useState({
-    limit: 20,
-    threshold: 0.6,
-  });
-  const [cvScores, setCvScores] = useState({}); 
+  const [cvScores, setCvScores] = useState({});
   const errorNotify = useNotification({ type: "error" });
+  const [scoreThreshold, setScoreThreshold] = useState(0);
+  const [sortField, setSortField] = useState("overall");
+
   const successNotify = useNotification({ type: "success" });
   const intervalFunction = useInterval(500);
 
@@ -188,6 +188,7 @@ export default function CVPage() {
       positionId,
       files,
       weights,
+      llmName,
       onFail: (msg) => {
         errorNotify({ message: msg });
         setUploadFiles(null);
@@ -206,18 +207,45 @@ export default function CVPage() {
             }
             watchUploadProgressApi(data.progress_id).then((progressData) => {
               if (progressData?.percent) {
-                setProgressObject((prev) => ({
-                  ...prev,
-                  ...progressData?.percent,
-                }));
-              }
-              if (_isProgressComplete(progressData?.percent)) {
-                stop();
-                setIsUploading(false);
-                successNotify({
-                  message: appStrings.language.cv.uploadSuccessMessage,
+                setProgressObject((prev) => {
+                  const updated = { ...prev };
+              
+                  Object.keys(prev).forEach((fileName) => {
+                    const newPercent = progressData.percent[fileName];
+                    updated[fileName] = newPercent !== undefined ? newPercent : prev[fileName];
+                  });
+              
+                  // ✅ Kiểm tra đúng status từ BE
+                  if (progressData.status === "completed") {
+                    stop();                    // Dừng interval khi BE báo completed
+                    setIsUploading(false);
+                    setProgressObject({});      // Reset progress
+              
+                    successNotify({
+                      message: appStrings.language.cv.uploadSuccessMessage,
+                    });
+              
+                    setTimeout(() => {
+                      getCVsApi({
+                        projectId,
+                        positionId,
+                        onFail: () => setCVs([]),
+                        onSuccess: (cvs) => {
+                          const formatedCVs = cvs.map((cv) => ({
+                            id: cv.id,
+                            cvName: cv.name,
+                            upload: cv.upload_at,
+                            labels: (cv.labels || []).map((l) => l.toLowerCase()),
+                          }));
+                          setCVs(formatedCVs);
+                        },
+                      });
+                    }, 1000);
+                  }
+              
+                  return updated;
                 });
-              }
+              }                          
             });
           },
         });
@@ -288,10 +316,8 @@ export default function CVPage() {
       errorNotify({ message: appStrings.language.cv.configureWeightMessage });
       return;
     }
-    console.log("Trọng số (weights) hiện tại:", weights);
-  
     setIsRematching(true);
-  
+
     // Gửi request rematch tới API, truyền weights trực tiếp mà không bọc trong 'weight'
     await rematchCVDataApi({
       projectId,
@@ -306,7 +332,7 @@ export default function CVPage() {
           title: appStrings.language.cv.rematchSuccessTitle,
           message: appStrings.language.cv.rematchSuccessMessage,
         });
-  
+
         // Sau khi rematch thành công, lấy lại danh sách CVs
         getCVsApi({
           projectId,
@@ -322,14 +348,14 @@ export default function CVPage() {
             setCVs(formatedCVs);
           },
         });
-  
+
         setIsRematching(false);  // Đặt lại trạng thái sau khi hoàn thành
       },
     });
   }
-  
-  
-  
+
+
+
 
   function handleDeleteCV(id) {
     deleteCVDataApi({
@@ -407,41 +433,6 @@ export default function CVPage() {
           ) : (
             <UploadZone onFileSelected={(files) => handleUploadFiles(files)} />
           )}
-          <Alert
-            variant="light"
-            color="grape"
-            title={appStrings.language.cv.shareUrlTitle}
-            icon={<IconShare3 />}
-          >
-            <Flex align="center" gap="xs">
-              {appStrings.language.cv.shareUrlMessage}
-              <CopyButton value={getShareUploadUrl(positionId)} timeout={2000}>
-                {({ copied, copy }) => (
-                  <Tooltip
-                    label={
-                      copied
-                        ? appStrings.language.btn.copied
-                        : appStrings.language.btn.copy
-                    }
-                    withArrow
-                    position="right"
-                  >
-                    <ActionIcon
-                      color={copied ? "teal" : "gray"}
-                      variant="subtle"
-                      onClick={copy}
-                    >
-                      {copied ? (
-                        <IconCheck size="1rem" />
-                      ) : (
-                        <IconCopy size="1rem" />
-                      )}
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-              </CopyButton>
-            </Flex>
-          </Alert>
         </Flex>
       </Spoiler>
       <Flex align="center" gap="md">
@@ -461,29 +452,37 @@ export default function CVPage() {
             </ActionIcon>
           </Popover.Target>
           <Popover.Dropdown>
-            <Flex direction="column" gap="sm">
-              <Text>{appStrings.language.cv.adjustLimit}</Text>
-              <Slider
-                min={0}
-                max={cvs?.length * 10}
-                defaultValue={adjustment.limit}
-                onChangeEnd={(value) =>
-                  setAdjustment((prev) => ({ ...prev, limit: value }))
-                }
+            <Flex direction="column" gap="xs">
+              <Text fw={600}>{appStrings.language.cv.sort}</Text>
+              <Select
+                value={sortField}
+                onChange={setSortField}
+                data={[
+                  { value: "overall", label: appStrings.language.cv.tableOverallScore },
+                  { value: "education", label: appStrings.language.cv.educationScore },
+                  { value: "technical", label: appStrings.language.cv.technicalScore },
+                  { value: "experience", label: appStrings.language.cv.experienceScore },
+                  { value: "language", label: appStrings.language.cv.languageScore },
+                  { value: "upload_asc", label: appStrings.language.cv.uploadAsc },
+                  { value: "upload_desc", label: appStrings.language.cv.uploadDesc },
+                ]}
+                size="xs"
+                radius="md"
               />
-              <Text>{appStrings.language.cv.adjustThreshold}</Text>
+              <Divider my="xs" />
+              <Text fw={600}>{appStrings.language.cv.filterOverall}</Text>
               <Slider
                 min={0}
-                max={1}
-                step={0.005}
-                defaultValue={adjustment.threshold}
-                onChangeEnd={(value) =>
-                  setAdjustment((prev) => ({ ...prev, threshold: value }))
-                }
+                max={100}
+                step={1}
+                value={scoreThreshold}
+                onChange={setScoreThreshold}
+                marks={[{ value: 0, label: "0" }, { value: 100, label: "100" }]}
               />
             </Flex>
           </Popover.Dropdown>
         </Popover>
+
         <Select
           placeholder={appStrings.language.cv.filter}
           data={LABELS.map((label) => ({
@@ -520,25 +519,54 @@ export default function CVPage() {
         loading={!search}
         data={(Array.isArray(search) ? [...search] : [])
           .filter((cv) => {
-            if (!labelFilter) return true;
-            return (cv.labels || []).some(
-              (lb) => lb.toLowerCase().replace(/ /g, "_") === labelFilter.toLowerCase()
-            );
+            const score = cvScores[cv.id]?.overallScore || 0;
+
+            const labelMatch =
+              !labelFilter ||
+              (cv.labels || []).some(
+                (lb) =>
+                  lb.toLowerCase().replace(/ /g, "_") === labelFilter.toLowerCase()
+              );
+
+            return score >= scoreThreshold && labelMatch;
           })
           .sort((a, b) => {
-            const scoreA = cvScores[a.id]?.overallScore || 0;
-            const scoreB = cvScores[b.id]?.overallScore || 0;
-            return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
+            const getScore = (cv, field) => {
+              const s = cvScores[cv.id] || {};
+              switch (field) {
+                case "education":
+                  return s.educationScore || 0;
+                case "technical":
+                  return s.technicalScore || 0;
+                case "experience":
+                  return s.experienceScore || 0;
+                case "language":
+                  return s.languageScore || 0;
+                case "upload_asc":
+                  return new Date(cv.upload).getTime();
+                case "upload_desc":
+                  return -new Date(cv.upload).getTime();
+                default:
+                  return s.overallScore || 0;
+              }
+            };
+
+            const sortValA = getScore(a, sortField);
+            const sortValB = getScore(b, sortField);
+
+            // Đảo ngược nếu là upload_asc hoặc upload_desc (đã có dấu âm sẵn)
+            if (sortField.startsWith("upload")) return sortValA - sortValB;
+            return sortOrder === "asc" ? sortValA - sortValB : sortValB - sortValA;
           })
           .map((data) => {
-            const scores = cvScores[data.id] || {};  
+            const scores = cvScores[data.id] || {};
             const label = data.label || "No Label";
 
             const educationScore = scores.educationScore || 0;
             const languageScore = scores.languageScore || 0;
             const technicalScore = scores.technicalScore || 0;
             const experienceScore = scores.experienceScore || 0;
-            const overallScore = scores.overallScore || 0; 
+            const overallScore = scores.overallScore || 0;
             const personalProjectsScore = scores.personalProjectsScore || 0;
             const publicationsScore = scores.publicationsScore || 0;
 

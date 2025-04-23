@@ -3,12 +3,13 @@ import { Menu, Button } from "@mantine/core"; // Đảm bảo rằng Menu đư�
 import { IconTrash, IconArchive, IconArchiveOff, IconDownload } from "@tabler/icons-react"; // Import IconDownload
 import appStrings from "../../utils/strings";
 
+
 export default function PositionAction({
   isClose,
   onCloseTap,
   onOpenTap,
   onDeleteTap,
-  onDownloadTap, // Thêm prop onDownloadTap để nhận hành động tải xuống
+  onDownloadTap,
 }) {
   return (
     <Fragment>

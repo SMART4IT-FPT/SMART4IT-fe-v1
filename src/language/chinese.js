@@ -141,6 +141,8 @@ const chinese = {
       responsibilities: "职责",
       personalProjectDetail: "个人项目详情",
       technologies: "技术",
+      selectLLM: "选择JD和CV分析的LLM模型",
+      selectWeight: "选择每个标准的权重",
     },
     cv: {
       title: "简历",
@@ -185,6 +187,10 @@ const chinese = {
       personalProjectScore: "个人项目分数",
       publicationScore: "出版物分数",
       filter: "按标签过滤",
+      uploadAsc: "上传日期 ↑",
+      uploadDesc: "上传日期 ↓",
+      filterOverall: "按总分过滤简历",
+      sort: "排序方式",
     },
     jd: {
       title: "职位描述",

@@ -44,10 +44,7 @@ export default function AppTable({
         {!loading ? (
           <Table.Tbody>
             {data
-              .slice(
-                (page - 1) * tablePageSize,
-                (page - 1) * tablePageSize + tablePageSize
-              )
+              .slice((page - 1) * tablePageSize, (page - 1) * tablePageSize + tablePageSize)
               .map((row, index) => (
                 <Table.Tr key={index}>
                   {columns.map((column, index) => (
@@ -57,16 +54,17 @@ export default function AppTable({
               ))}
           </Table.Tbody>
         ) : (
-          Array.from({ length: tablePageSize }).map((_, index) => (
+          <Table.Tbody>{Array.from({ length: tablePageSize }).map((_, index) => (
             <Table.Tr key={index}>
               {columns.map((_, index) => (
                 <Table.Td key={index}>
-                  <Skeleton key={index} height={30} />
+                  <Skeleton height={30} />
                 </Table.Td>
               ))}
             </Table.Tr>
-          ))
+          ))}</Table.Tbody>          
         )}
+
       </Table>
       {!loading && data?.length ? (
         <Flex align="center" gap="md">

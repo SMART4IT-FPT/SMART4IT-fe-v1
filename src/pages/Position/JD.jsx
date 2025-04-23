@@ -22,6 +22,8 @@ import Superscript from "@tiptap/extension-superscript";
 import SubScript from "@tiptap/extension-subscript";
 import HeadingLayout from "../../components/Layout/HeadingLayout";
 import appStrings from "../../utils/strings";
+import useWeightState from "../../context/weight";
+
 
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -36,6 +38,8 @@ export default function JDPage() {
   const position = usePositionsState((state) => state.position);
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
+  const llmName = useWeightState((state) => state.llmName);
+
 
   const editorController = useEditor({
     extensions: [
@@ -73,6 +77,7 @@ export default function JDPage() {
       projectId,
       positionId,
       content,
+      llmName,
       onFail: (msg) => {
         errorNotify({ message: msg });
         setIsLoading(false);

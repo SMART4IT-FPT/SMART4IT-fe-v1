@@ -46,22 +46,24 @@ export async function uploadCVDataApi({
   projectId,
   positionId,
   files,
-  weights,  // weight là đối tượng JSON
+  weights,
+  llmName, // ✅ thêm dòng này
   onFail,
   onSuccess,
 }) {
   const formData = new FormData();
 
-  // Thêm các file vào formData
   files.forEach((file) => {
     formData.append("cvs", file);
   });
 
-  // Truyền weights như là đối tượng JSON, không phải chuỗi JSON
-  formData.append("weight", JSON.stringify(weights));  // sửa tại đây nếu weights đã là đối tượng
+  formData.append("weight", JSON.stringify(weights));
+
+  if (llmName) {
+    formData.append("llm_name", llmName);
+  }
 
   try {
-    // Gửi yêu cầu POST với formData
     const response = await apiHelper.postFormData(
       apiUrls.uploadCV(projectId, positionId),
       formData
@@ -81,6 +83,7 @@ export async function uploadCVDataApi({
     onFail("Lỗi khi gửi yêu cầu");
   }
 }
+
 
 export async function uploadCVDataPublicApi({
   positionId,
@@ -185,14 +188,18 @@ export async function rematchCVDataApi({
   projectId,
   positionId,
   weights,
+  llmName,
   onFail,
   onSuccess,
 }) {
   try {
-    // Truyền weights trực tiếp vào body request
-    const response = await apiHelper.post(
+    const formData = new FormData();
+    formData.append("llm_name", llmName);
+    formData.append("weight", JSON.stringify(weights)); // cần stringify!
+
+    const response = await apiHelper.postFormData(
       apiUrls.rematchCVs(projectId, positionId),
-      weights  // Truyền trực tiếp đối tượng weights vào API
+      formData
     );
 
     if (response.msg) {
@@ -205,4 +212,3 @@ export async function rematchCVDataApi({
     onFail("Lỗi khi gửi yêu cầu rematch");
   }
 }
-
