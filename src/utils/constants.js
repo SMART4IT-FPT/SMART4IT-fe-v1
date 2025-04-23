@@ -1,8 +1,8 @@
 export const googleClientId =
   "484408725212-fk2jfke755huoq3jt6qi30hc2ik4tr27.apps.googleusercontent.com";
 
-export const baseUrl = "http://127.0.0.1:7860";
-// export const baseUrl = "https://smart4it-be-v1.politecliff-3bfd2b46.southeastasia.azurecontainerapps.io";
+// export const baseUrl = "http://127.0.0.1:7860";
+export const baseUrl = "https://smart4it-be-v1.politecliff-3bfd2b46.southeastasia.azurecontainerapps.io";
 
 export const apiUrls = {
   // Auth
