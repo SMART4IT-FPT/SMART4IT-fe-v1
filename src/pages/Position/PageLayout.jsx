@@ -1,8 +1,9 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   IconArrowLeft,
   IconFileCv,
   IconFileDescription,
+  IconChartBar,
   // IconQuestionMark,
   IconHome,
   IconHomeFilled,
@@ -23,14 +24,13 @@ import useProjectsState from "../../context/project";
 export default function PositionPageLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { 'project-id': projectId, 'position-id': positionId } = useParams();
   const user = useGlobalState((state) => state.user);
   const setUser = useGlobalState((state) => state.setUser);
   const projects = useProjectsState((state) => state.projects);
   const setProjects = useProjectsState((state) => state.setProjects);
   const shared = useProjectsState((state) => state.shared);
   const setShared = useProjectsState((state) => state.setShared);
-  const projectId = location.pathname.split("/")[1];
-  const positionId = location.pathname.split("/")[2];
   const isGeneral = location.pathname.split("/")[3] === undefined;
   const setPosition = usePositionsState((state) => state.setPosition);
   const errorNotify = useNotification({ type: "error" });
@@ -59,6 +59,11 @@ export default function PositionPageLayout() {
       label: appStrings.language.cv.title,
       icon: <IconFileCv size="1rem" />,
       to: `/${projectId}/${positionId}/cv`,
+    },
+    {
+      label: appStrings.language.position.dashboard,
+      icon: <IconChartBar size="1rem" />,
+      to: `/${projectId}/${positionId}/dashboard`,
     },
   ];
 

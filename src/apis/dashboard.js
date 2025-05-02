@@ -80,3 +80,41 @@ export async function getTrashProjectsApi({ onFail, onSuccess }) {
     onFail(response.detail);
   }
 }
+
+export async function getProjectDashboardApi({ projectId, onFail, onSuccess }) {
+  const token = getCookie("token");
+  if (!token) {
+    onFail(appStrings.language.auth.noLogin);
+    return;
+  }
+
+  const response = await apiHelper.get(apiUrls.getProjectDashboard(projectId));
+  if (response.msg) {
+    if (response.data) {
+      onSuccess(response.data);
+    } else {
+      onFail(appStrings.language.utils.noDataFound);
+    }
+  } else {
+    onFail(response.detail);
+  }
+}
+
+export async function getPositionDashboardApi({ projectId, positionId, onFail, onSuccess }) {
+  const token = getCookie("token");
+  if (!token) {
+    onFail(appStrings.language.auth.noLogin);
+    return;
+  }
+
+  const response = await apiHelper.get(apiUrls.getPositionDashboard(projectId, positionId));
+  if (response.msg) {
+    if (response.data) {
+      onSuccess(response.data);
+    } else {
+      onFail(appStrings.language.utils.noDataFound);
+    }
+  } else {
+    onFail(response.detail);
+  }
+}

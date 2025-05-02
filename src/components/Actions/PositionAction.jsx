@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Menu, Button } from "@mantine/core"; // Đảm bảo rằng Menu được sử dụng chính xác
 import { IconTrash, IconArchive, IconArchiveOff, IconDownload } from "@tabler/icons-react"; // Import IconDownload
+import { useNavigate } from "react-router-dom";
 import appStrings from "../../utils/strings";
 
 
@@ -10,7 +11,15 @@ export default function PositionAction({
   onOpenTap,
   onDeleteTap,
   onDownloadTap,
+  positionId,
+  projectId,
 }) {
+  const navigate = useNavigate();
+
+  const handleDashboardClick = () => {
+    navigate(`/${projectId}/${positionId}/dashboard`);
+  };
+
   return (
     <Fragment>
       <Menu.Item
