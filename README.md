@@ -1,25 +1,32 @@
-# CV Matcher
+# SMART4IT Frontend
 
-### 🚀 Deployment
+A modern web application built with React and Vite, featuring a rich set of UI components and functionality.
 
-Deployed on [Vercel]()
+## 🚀 Features
 
-### ⚡ How to run this project
+- Modern React-based frontend architecture
+- Rich UI components using Mantine UI
+- Document viewer integration
+- Advanced text editing capabilities with TipTap
+- Charting and data visualization
+- Google OAuth integration
+- PDF handling
+- Responsive design
+- Internationalization support
 
+## 📦 Installation
+
+1. Clone the repository:
 ```bash
-# Clone this project
-git clone https://github.com/SMART4IT-FPT/SMART4IT-fe.git
-
-# Change directory to the project
-cd ./frontend
-
-# Install node dependencies
-npm install
-
-# Start development
-npm run dev
+git clone [repository-url]
 ```
 
-### 🤗 Contributors
-- Diệp Gia Đông
-"# SMART4IT-fe" 
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```

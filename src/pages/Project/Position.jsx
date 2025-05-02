@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Flex, Title, Input, Loader } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconSearch, IconPlus } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconChartBar } from "@tabler/icons-react";
 import GridLayout from "../../components/Layout/GridLayout";
 import HeadingLayout from "../../components/Layout/HeadingLayout";
 import CreatePositionModal from "../Modal/CreatePositionModal";

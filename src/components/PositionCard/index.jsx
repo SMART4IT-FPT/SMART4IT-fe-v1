@@ -11,6 +11,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useHover } from "@mantine/hooks";
 import { IconDots } from "@tabler/icons-react";
+import React from "react";
 
 export default function PositionCard({
   id,
@@ -49,7 +50,12 @@ export default function PositionCard({
                 <IconDots />
               </ActionIcon>
             </Menu.Target>
-            <Menu.Dropdown p={5}>{actions}</Menu.Dropdown>
+            <Menu.Dropdown p={5}>
+              {React.cloneElement(actions, {
+                projectId,
+                positionId: id,
+              })}
+            </Menu.Dropdown>
           </Menu>
         ) : null}
       </Group>

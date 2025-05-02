@@ -35,10 +35,10 @@ export default function ProjectPageLayout() {
       to: `/${projectId}`,
     },
     {
-      label: appStrings.language.insight.title,
+      label: "Dashboard",
       icon: <IconChartBar size="1rem" />,
       activeIcon: <IconChartBar size="1rem" />,
-      to: `/${projectId}/insights`,
+      to: `/${projectId}/dashboard`,
     },
   ];
 
