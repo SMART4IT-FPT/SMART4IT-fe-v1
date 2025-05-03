@@ -19,8 +19,8 @@ import CVDetailPage from "../pages/Position/CVDetail";
 import RedirectPage from "../pages/Utils/Redirect";
 import NotFoundPage from "../pages/Utils/NotFound";
 import UploadPage from "../pages/Upload/UploadPage";
-import ProjectDashboardPage from "../pages/dashboard/ProjectDashboardPage";
-import PositionDashboardPage from "../pages/dashboard/PositionDashboardPage";
+import ProjectDashboardPage from "../pages/Dashboard/ProjectDashboardPage";
+import PositionDashboardPage from "../pages/Dashboard/PositionDashboardPage";
 
 const appRoutes = [
   {
