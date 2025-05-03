@@ -11,8 +11,10 @@ export default defineConfig({
       name: 'copy-staticwebapp-config',
       closeBundle() {
         copyFileSync(
-          resolve(__dirname, 'staticwebapp.config.json'),
-          resolve(__dirname, 'dist/staticwebapp.config.json')
+          const source = resolve(__dirname, 'staticwebapp.config.json');
+          const target = resolve(__dirname, 'dist/staticwebapp.config.json');
+          console.log('SOURCE PATH:', source);
+          console.log('TARGET PATH:', target);
         );
       },
     },
