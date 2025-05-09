@@ -1,10 +1,10 @@
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   IconArrowLeft,
+  IconAssemblyFilled,
   IconFileCv,
   IconFileDescription,
   IconChartBar,
-  // IconQuestionMark,
   IconHome,
   IconHomeFilled,
 } from "@tabler/icons-react";
@@ -34,13 +34,23 @@ export default function PositionPageLayout() {
   const isGeneral = location.pathname.split("/")[3] === undefined;
   const setPosition = usePositionsState((state) => state.setPosition);
   const errorNotify = useNotification({ type: "error" });
+  const projectName = projects?.find((project) => project.id === projectId)?.name || "Project";
 
   const navbarNavigation = [
     {
-      label: appStrings.language.btn.back,
-      icon: <IconArrowLeft size="1rem" />,
-      to: `/${projectId}`,
-    },
+      label: (
+        <strong
+          style={{
+            background: "linear-gradient(to right, #6a11cb, #2575fc)",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.5rem",
+            color: "#fff",
+          }}
+        >{projectName}</strong>
+      ),
+      icon: <IconAssemblyFilled size="1rem" />,
+      activeIcon: <IconAssemblyFilled size="1rem" />,
+    }
   ];
 
   const navbarItems = [
@@ -64,6 +74,14 @@ export default function PositionPageLayout() {
       label: appStrings.language.position.dashboard,
       icon: <IconChartBar size="1rem" />,
       to: `/${projectId}/${positionId}/dashboard`,
+    },
+  ];
+
+  const navbarBack = [
+    {
+      label: appStrings.language.btn.back,
+      icon: <IconArrowLeft size="1rem" />,
+      to: `/${projectId}`,
     },
   ];
 
@@ -105,6 +123,7 @@ export default function PositionPageLayout() {
     <AppLayout
       navPreItems={navbarNavigation}
       navItems={navbarItems}
+      navPostItems={navbarBack}
       aside={!isGeneral ? <PositionGeneralPage /> : null}
     >
       <Outlet />

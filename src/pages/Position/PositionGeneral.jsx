@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import usePositionsState from "../../context/position";
 import useWeightState from "../../context/weight";
+import { getJDApi, uploadJDApi } from "../../apis/jd";
 import {
   closePositionApi,
   deletePositionApi,
@@ -31,7 +32,6 @@ import {
 } from "../../apis/positions";
 import useNotification from "../../hooks/useNotification";
 import useConfirmModal from "../../hooks/useConfirmModal";
-
 
 export default function PositionGeneralPage() {
   const location = useLocation();
@@ -42,7 +42,6 @@ export default function PositionGeneralPage() {
   const setWeights = useWeightState((state) => state.setWeights);
   const llmName = useWeightState((state) => state.llmName);
   const setLlmName = useWeightState((state) => state.setLlmName);
-
 
   const [form, setForm] = useState({ startDate: null, endDate: null });
   const [openedModal, setOpenedModal] = useState(null);
@@ -69,12 +68,13 @@ export default function PositionGeneralPage() {
     "gemini-1.5-flash",
     "gemini-1.5-pro",
     "gpt-4o-mini",
-    "gpt-4o"
+    "gpt-4o",
   ];
-
 
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
+  const [jd, setJD] = useState(null); // State to hold jd data
+  const [isFetchingJD, setIsFetchingJD] = useState(true); // State to track JD fetching
 
   function handleStartDateChange(value) {
     setForm({ ...form, startDate: value });
@@ -111,7 +111,7 @@ export default function PositionGeneralPage() {
       },
     });
   }
-  
+
   function handleDownloadSummary(positionId) {
     downloadCvsSummaryListApi({
       projectId,
@@ -124,7 +124,6 @@ export default function PositionGeneralPage() {
       },
     });
   }
-
 
   function handleDeletePosition() {
     deletePositionApi({
@@ -140,12 +139,26 @@ export default function PositionGeneralPage() {
     });
   }
 
-
-
   const deletePositionTrigger = useConfirmModal({
     type: "delete",
     onOk: handleDeletePosition,
   });
+
+  // Fetch JD data
+  useEffect(() => {
+    getJDApi({
+      projectId,
+      positionId,
+      onFail: (msg) => {
+        errorNotify({ message: msg });
+        setIsFetchingJD(false);
+      },
+      onSuccess: (jd) => {
+        setJD(jd);
+        setIsFetchingJD(false);
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (position) {
@@ -154,7 +167,7 @@ export default function PositionGeneralPage() {
         endDate: new Date(position.end_date),
       });
 
-      // nếu đã có weight trong zustand => dùng lại
+      // Nếu đã có weight trong zustand => dùng lại
       const zustandWeights = useWeightState.getState().weights;
       if (zustandWeights) {
         setCvWeights(zustandWeights);
@@ -162,16 +175,13 @@ export default function PositionGeneralPage() {
     }
   }, [position]);
 
-
-
   const setCvWeightsAndSync = (updaterFn) => {
     setCvWeights((prev) => {
       const updated = updaterFn(prev);
-      setWeights(updated); // cập nhật vào zustand luôn
+      setWeights(updated); // Cập nhật vào zustand luôn
       return updated;
     });
   };
-
 
   const renderMainWeightInput = (label, value, onChange, modalKey) => (
     <NumberInput
@@ -235,6 +245,25 @@ export default function PositionGeneralPage() {
 
         <Text size="lg">{position?.description}</Text>
 
+        {/* Display JD content */}
+        <Paper withBorder shadow="xs" p="md" radius="md">
+          <Text fw={600} size="lg" mb="sm">
+            {appStrings.language.jd.extractionTitle || "Job Description"}
+          </Text>
+          {isFetchingJD ? (
+            <Text>Loading...</Text>
+          ) : jd && jd.content ? (
+            <div
+              style={{ lineHeight: 1.6, fontSize: "14px" }}
+              dangerouslySetInnerHTML={{ __html: jd.content }}
+            />
+          ) : (
+            <Text size="sm" c="dimmed">
+              No job description available.
+            </Text>
+          )}
+        </Paper>
+
         <Flex gap="lg">
           <DateInput
             rightSection={<IconCalendarEvent />}
@@ -260,7 +289,11 @@ export default function PositionGeneralPage() {
           />
         </Flex>
 
-        <Divider my="md" label={appStrings.language.positionDetail.weightConfigureLabel} labelPosition="left" />
+        <Divider
+          my="md"
+          label={appStrings.language.positionDetail.weightConfigureLabel}
+          labelPosition="left"
+        />
         <Paper withBorder shadow="xs" p="md" radius="md" mb="md">
           <Flex direction="column" gap="sm">
             <Text fw={600}>{appStrings.language.positionDetail.selectLLM}</Text>
@@ -287,10 +320,8 @@ export default function PositionGeneralPage() {
           </Flex>
         </Paper>
 
-
         <Paper withBorder shadow="xs" p="md" radius="md">
           <Flex direction="column" gap="sm">
-
             <Text fw={600}>{appStrings.language.positionDetail.selectWeight}</Text>
             <Group gap="lg" wrap="wrap">
               {renderMainWeightInput(
@@ -376,20 +407,127 @@ export default function PositionGeneralPage() {
           </Flex>
         </Paper>
 
-
-        <Modal title={appStrings.language.positionDetail.workExperienceDetail} opened={openedModal === "experience"} onClose={() => setOpenedModal(null)}>
+        <Modal
+          title={appStrings.language.positionDetail.workExperienceDetail}
+          opened={openedModal === "experience"}
+          onClose={() => setOpenedModal(null)}
+        >
           <Flex direction="column" gap="sm">
-            <NumberInput label={appStrings.language.positionDetail.relevan} value={cvWeights.work_experience_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label={appStrings.language.positionDetail.duration} value={cvWeights.work_experience_score_config.duration_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, duration_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label={appStrings.language.positionDetail.responsibilities} value={cvWeights.work_experience_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, work_experience_score_config: { ...prev.work_experience_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput
+              label={appStrings.language.positionDetail.relevan}
+              value={cvWeights.work_experience_score_config.relevance_score_w}
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  work_experience_score_config: {
+                    ...prev.work_experience_score_config,
+                    relevance_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
+            <NumberInput
+              label={appStrings.language.positionDetail.duration}
+              value={cvWeights.work_experience_score_config.duration_score_w}
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  work_experience_score_config: {
+                    ...prev.work_experience_score_config,
+                    duration_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
+            <NumberInput
+              label={appStrings.language.positionDetail.responsibilities}
+              value={
+                cvWeights.work_experience_score_config.responsibilities_score_w
+              }
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  work_experience_score_config: {
+                    ...prev.work_experience_score_config,
+                    responsibilities_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
           </Flex>
         </Modal>
 
-        <Modal title={appStrings.language.positionDetail.personalProjectDetail} opened={openedModal === "projects"} onClose={() => setOpenedModal(null)}>
+        <Modal
+          title={appStrings.language.positionDetail.personalProjectDetail}
+          opened={openedModal === "projects"}
+          onClose={() => setOpenedModal(null)}
+        >
           <Flex direction="column" gap="sm">
-            <NumberInput label={appStrings.language.positionDetail.relevan} value={cvWeights.personal_projects_score_config.relevance_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, relevance_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label={appStrings.language.positionDetail.technologies} value={cvWeights.personal_projects_score_config.technologies_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, technologies_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
-            <NumberInput label={appStrings.language.positionDetail.responsibilities} value={cvWeights.personal_projects_score_config.responsibilities_score_w} onChange={(val) => setCvWeights((prev) => ({ ...prev, personal_projects_score_config: { ...prev.personal_projects_score_config, responsibilities_score_w: val } }))} min={0} max={1} step={0.01} precision={2} />
+            <NumberInput
+              label={appStrings.language.positionDetail.relevan}
+              value={cvWeights.personal_projects_score_config.relevance_score_w}
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  personal_projects_score_config: {
+                    ...prev.personal_projects_score_config,
+                    relevance_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
+            <NumberInput
+              label={appStrings.language.positionDetail.technologies}
+              value={cvWeights.personal_projects_score_config.technologies_score_w}
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  personal_projects_score_config: {
+                    ...prev.personal_projects_score_config,
+                    technologies_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
+            <NumberInput
+              label={appStrings.language.positionDetail.responsibilities}
+              value={
+                cvWeights.personal_projects_score_config.responsibilities_score_w
+              }
+              onChange={(val) =>
+                setCvWeights((prev) => ({
+                  ...prev,
+                  personal_projects_score_config: {
+                    ...prev.personal_projects_score_config,
+                    responsibilities_score_w: val,
+                  },
+                }))
+              }
+              min={0}
+              max={1}
+              step={0.01}
+              precision={2}
+            />
           </Flex>
         </Modal>
       </Flex>
