@@ -102,7 +102,7 @@ export default function AppLayout({
               size="sm"
             />
             <Logo size={35} onTap={handleNavigateToDashboard} />
-            {projects && shared && !isDashboard ? (
+            {/* {projects && shared && !isDashboard ? (
               <Select
                 w="13rem"
                 allowDeselect={false}
@@ -126,7 +126,7 @@ export default function AppLayout({
                 ]}
                 onChange={(value) => handleChangeProject(value)}
               />
-            ) : null}
+            ) : null} */}
           </Group>
           <User
             onUserTap={handleViewUser}

@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box, LoadingOverlay } from "@mantine/core";
 import {
+  IconAssemblyFilled,
   IconSquare,
   IconChartBar,
   IconSettings,
@@ -26,6 +27,24 @@ export default function ProjectPageLayout() {
   const user = useGlobalState((state) => state.user);
   const setUser = useGlobalState((state) => state.setUser);
   const errorNotify = useNotification({ type: "error" });
+  const projectName = projects?.find((project) => project.id === projectId)?.name || "Project";
+
+  const projectNameItem = [
+    {
+      label: (
+        <strong
+          style={{
+            background: "linear-gradient(to right, #6a11cb, #2575fc)",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.5rem",
+            color: "#fff",
+          }}
+        >{projectName}</strong>
+      ),
+      icon: <IconAssemblyFilled size="1rem" />,
+      activeIcon: <IconAssemblyFilled size="1rem" />,
+    }
+  ];
 
   const navbarItems = [
     {
@@ -90,7 +109,7 @@ export default function ProjectPageLayout() {
   }, [setProjects, setShared]);
 
   return (
-    <AppLayout navItems={navbarItems} navPostItems={navbarSettings}>
+    <AppLayout navPreItems={projectNameItem} navItems={navbarItems} navPostItems={navbarSettings}>
       <Outlet />
     </AppLayout>
   );
