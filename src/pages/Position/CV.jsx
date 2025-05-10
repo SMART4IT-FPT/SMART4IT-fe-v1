@@ -144,6 +144,7 @@ export default function CVPage() {
     },
   ];
 
+  const positionStatus = position?.status || "open";
   const [isUploading, setIsUploading] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
   const [progressObject, setProgressObject] = useState({});
@@ -151,7 +152,6 @@ export default function CVPage() {
   const errorNotify = useNotification({ type: "error" });
   const [scoreThreshold, setScoreThreshold] = useState(0);
   const [sortField, setSortField] = useState("overall");
-
   const successNotify = useNotification({ type: "success" });
   const intervalFunction = useInterval(500);
 
@@ -412,16 +412,20 @@ export default function CVPage() {
         initialState={true}
         maxHeight={0}
         showLabel={
-          <Flex align="center" gap="xs">
-            <Text>{appStrings.language.cv.showUploadZone}</Text>
-            <IconChevronDown size="1rem" />
-          </Flex>
+          positionStatus === "open" && (
+            <Flex align="center" gap="xs">
+              <Text>{appStrings.language.cv.showUploadZone}</Text>
+              <IconChevronDown size="1rem" />
+            </Flex>
+          )
         }
         hideLabel={
-          <Flex align="center" gap="xs">
-            <Text c="dimmed">{appStrings.language.cv.hideUploadZone}</Text>
-            <IconChevronUp size="1rem" color="gray" />
-          </Flex>
+          positionStatus === "open" && (
+            <Flex align="center" gap="xs">
+              <Text c="dimmed">{appStrings.language.cv.hideUploadZone}</Text>
+              <IconChevronUp size="1rem" color="gray" />
+            </Flex>
+          )
         }
       >
         <Flex direction="column" gap="md">
@@ -431,8 +435,10 @@ export default function CVPage() {
               isClosable={!isUploading}
               onClose={() => setUploadFiles(null)}
             />
-          ) : (
+          ) : positionStatus === "open" ? (
             <UploadZone onFileSelected={(files) => handleUploadFiles(files)} />
+          ) : (
+            <Text c="red">Please open this hiring request to upload CVs.</Text>
           )}
         </Flex>
       </Spoiler>
@@ -717,8 +723,6 @@ export default function CVPage() {
           })}
         pageSize={5}
       />
-
-
     </Flex>
   );
 }

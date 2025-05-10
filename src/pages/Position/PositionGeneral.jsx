@@ -70,6 +70,14 @@ export default function PositionGeneralPage() {
     "gpt-4o-mini",
     "gpt-4o",
   ];
+  
+  const statusMap = {
+    open: { label: "Open", color: "green" },
+    processing: { label: "Processing", color: "blue" },
+    closed: { label: "Closed", color: "yellow" },
+    cancelled: { label: "Cancelled", color: "red" },
+  };
+  const currentStatus = statusMap[position?.status] || { label: "Unknown", color: "gray" };
 
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
@@ -217,12 +225,10 @@ export default function PositionGeneralPage() {
             <Title order={1}>{position?.name}</Title>
             <Badge
               variant="light"
-              color={position?.is_closed ? "red" : "green"}
+              color={currentStatus.color}
               style={{ marginLeft: 20 }}
             >
-              {position?.is_closed
-                ? appStrings.language.positionDetail.closedLabel
-                : appStrings.language.positionDetail.activeLabel}
+              {currentStatus.label}
             </Badge>
           </Flex>
           <Menu withinPortal shadow="md" position="bottom-end" width={150}>

@@ -43,10 +43,40 @@ export default function YourPositionPage() {
   function _handleFilterPositions(positions) {
     if (!positions) return [null, null];
     const _activePositions = positions.filter(
-      (position) => !position.is_closed
+      (position) => position.status !== "closed"
     );
-    const _closedPositions = positions.filter((position) => position.is_closed);
+    const _closedPositions = positions.filter(
+      (position) => position.status === "closed"
+    );
     return [_activePositions, _closedPositions];
+  }
+  function _handleUpdatePositionData(id, type) {
+    if (type === "delete") {
+      const _processedPositions = positions.filter(
+        (position) => position.id !== id
+      );
+      const [_activePositions, _closedPositions] =
+        _handleFilterPositions(_processedPositions);
+      setPositions(_processedPositions);
+      setActivePositions(_activePositions);
+      setClosedPositions(_closedPositions); 
+    } else {
+      const _processedPositions = positions.map((position) => {
+        if (position.id === id) {
+          return {
+            ...position,
+            status: type === "closed" ? "closed" : "open", 
+            is_closed: type === "closed",
+          };
+        }
+        return position;
+      });
+      const [_activePositions, _closedPositions] =
+        _handleFilterPositions(_processedPositions);
+      setPositions(_processedPositions);
+      setActivePositions(_activePositions);
+      setClosedPositions(_closedPositions);
+    }
   }
 
   function _handleUpdatePositionData(id, type) {

@@ -10,6 +10,7 @@ import {
   Tooltip,
   Divider,
   Box,
+  Text, // Ensure Text is imported
 } from "@mantine/core";
 import { RichTextEditor, Link } from "@mantine/tiptap";
 import { IconInfoSquareRounded } from "@tabler/icons-react";
@@ -23,8 +24,6 @@ import SubScript from "@tiptap/extension-subscript";
 import HeadingLayout from "../../components/Layout/HeadingLayout";
 import appStrings from "../../utils/strings";
 import useWeightState from "../../context/weight";
-
-
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import useNotification from "../../hooks/useNotification";
@@ -36,10 +35,10 @@ export default function JDPage() {
   const projectId = location.pathname.split("/")[1];
   const positionId = location.pathname.split("/")[2];
   const position = usePositionsState((state) => state.position);
+  const positionStatus = position?.status || "open"; // Ensure this defaults to 'open' if undefined
   const errorNotify = useNotification({ type: "error" });
   const successNotify = useNotification({ type: "success" });
   const llmName = useWeightState((state) => state.llmName);
-
 
   const editorController = useEditor({
     extensions: [
@@ -53,6 +52,7 @@ export default function JDPage() {
     ],
     content: "",
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [jd, setJD] = useState(null);
@@ -104,23 +104,22 @@ export default function JDPage() {
       <HeadingLayout>
         <Title order={1}>{appStrings.language.jd.heading}</Title>
       </HeadingLayout>
-      <Alert variant="light" color="blue">
-        <Group justify="space-between" align="center">
-          <div>
-            <Title order={4}>{appStrings.language.jd.uploadJDTitle}</Title>
-            {appStrings.language.jd.uploadJDMessage}
-          </div>
-          <FileButton accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-            {(props) => (
-              <Button {...props}>{appStrings.language.jd.uploadJDBtn}</Button>
-            )}
-          </FileButton>
-        </Group>
-      </Alert>
+
+      {/* Show the red text if positionStatus is not 'open' */}
+      {positionStatus !== "open" && (
+        <Text c="red">
+          Please open this hiring request to upload a job description.
+        </Text>
+      )}
+
       {isFetching ? (
         <Skeleton height={400} />
       ) : (
-        <RichTextEditor editor={editorController} style={{ height: "400px" }}>
+        <RichTextEditor
+          editor={editorController}
+          style={{ height: "400px" }}
+          editable={positionStatus === "open"} // Disable editor if status is not "open"
+        >
           <RichTextEditor.Toolbar sticky stickyOffset={60}>
             <RichTextEditor.ControlsGroup>
               <RichTextEditor.Bold />
@@ -171,15 +170,19 @@ export default function JDPage() {
           />
         </RichTextEditor>
       )}
+
       <Flex justify="flex-end" gap="md">
-        <Button
-          loading={isLoading}
-          onClick={handleSaveJD}
-          disabled={isFetching}
-        >
-          {appStrings.language.btn.save}
-        </Button>
+        {positionStatus === "open" && (
+          <Button
+            loading={isLoading}
+            onClick={handleSaveJD}
+            disabled={isFetching} // Disable save button when fetching
+          >
+            {appStrings.language.btn.save}
+          </Button>
+        )}
       </Flex>
+
       {Object.keys(jd?.extraction || {}).length ? <Divider /> : null}
       <Flex direction="column" gap="xl" mb="xl">
         {jd && jd.extraction && Object.keys(jd.extraction).length > 0 ? (
