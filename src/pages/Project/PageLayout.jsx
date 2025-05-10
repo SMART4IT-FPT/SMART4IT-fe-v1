@@ -27,7 +27,11 @@ export default function ProjectPageLayout() {
   const user = useGlobalState((state) => state.user);
   const setUser = useGlobalState((state) => state.setUser);
   const errorNotify = useNotification({ type: "error" });
-  const projectName = projects?.find((project) => project.id === projectId)?.name || "Project";
+  const projectName =
+    projects?.find(project => project.id === projectId)?.name ||
+    shared?.find(project => project.id === projectId)?.name ||
+    trash?.find(project => project.id === projectId)?.name ||
+    "Project";
 
   const projectNameItem = [
     {

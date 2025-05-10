@@ -322,6 +322,7 @@ export default function CVPage() {
     await rematchCVDataApi({
       projectId,
       positionId,
+      llmName: llmName,
       weights: weights,  // Truyền trực tiếp đối tượng weights
       onFail: (msg) => {
         errorNotify({ message: msg });

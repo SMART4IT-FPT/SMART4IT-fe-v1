@@ -34,7 +34,11 @@ export default function PositionPageLayout() {
   const isGeneral = location.pathname.split("/")[3] === undefined;
   const setPosition = usePositionsState((state) => state.setPosition);
   const errorNotify = useNotification({ type: "error" });
-  const projectName = projects?.find((project) => project.id === projectId)?.name || "Project";
+  const projectName =
+    projects?.find(project => project.id === projectId)?.name ||
+    shared?.find(project => project.id === projectId)?.name ||
+    trash?.find(project => project.id === projectId)?.name ||
+    "Project";
 
   const navbarNavigation = [
     {
