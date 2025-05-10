@@ -79,28 +79,28 @@ export default function YourPositionPage() {
     }
   }
 
-  function _handleUpdatePositionData(id, type) {
-    if (type === "delete") {
-      const _processedPositions = positions.filter(
-        (position) => position.id !== id
-      );
-      const [_activePositions, _closedPositions] =
-        _handleFilterPositions(_processedPositions);
-      setPositions(_processedPositions);
-      setActivePositions(_activePositions);
-    } else {
-      const _processedPositions = positions.map((position) => {
-        if (position.id === id) {
-          return { ...position, is_closed: type === "closed" ? true : false };
-        }
-        return position;
-      });
-      const [_activePositions, _closedPositions] =
-        _handleFilterPositions(_processedPositions);
-      setActivePositions(_activePositions);
-      setClosedPositions(_closedPositions);
-    }
-  }
+  // function _handleUpdatePositionData(id, type) {
+  //   if (type === "delete") {
+  //     const _processedPositions = positions.filter(
+  //       (position) => position.id !== id
+  //     );
+  //     const [_activePositions, _closedPositions] =
+  //       _handleFilterPositions(_processedPositions);
+  //     setPositions(_processedPositions);
+  //     setActivePositions(_activePositions);
+  //   } else {
+  //     const _processedPositions = positions.map((position) => {
+  //       if (position.id === id) {
+  //         return { ...position, is_closed: type === "closed" ? true : false };
+  //       }
+  //       return position;
+  //     });
+  //     const [_activePositions, _closedPositions] =
+  //       _handleFilterPositions(_processedPositions);
+  //     setActivePositions(_activePositions);
+  //     setClosedPositions(_closedPositions);
+  //   }
+  // }
 
   function handleSearchPositions(query) {
     if (!query) {

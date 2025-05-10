@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { Menu, Button } from "@mantine/core"; // Đảm bảo rằng Menu được sử dụng chính xác
-import { IconTrash, IconArchive, IconArchiveOff, IconDownload } from "@tabler/icons-react"; // Import IconDownload
+import { Menu, Button } from "@mantine/core";
+import { IconTrash, IconArchive, IconArchiveOff, IconDownload } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import appStrings from "../../utils/strings";
 
