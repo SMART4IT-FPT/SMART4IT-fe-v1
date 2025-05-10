@@ -30,7 +30,6 @@ export default function ProjectPageLayout() {
   const projectName =
     projects?.find(project => project.id === projectId)?.name ||
     shared?.find(project => project.id === projectId)?.name ||
-    trash?.find(project => project.id === projectId)?.name ||
     "Project";
 
   const projectNameItem = [
