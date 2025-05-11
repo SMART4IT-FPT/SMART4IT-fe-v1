@@ -50,18 +50,18 @@ export default function PositionGeneralPage() {
     language_skills_score_config: { W_language_skills_score: 0.1 },
     technical_skills_score_config: { W_technical_skills_score: 0.3 },
     work_experience_score_config: {
-      W_work_experience_score: 0.4,
+      W_work_experience_score: 0.3,
       relevance_score_w: 0.6,
       duration_score_w: 0.2,
       responsibilities_score_w: 0.2,
     },
     personal_projects_score_config: {
-      W_personal_projects_score: 0.2,
+      W_personal_projects_score: 0.15,
       relevance_score_w: 0.6,
       technologies_score_w: 0.2,
       responsibilities_score_w: 0.2,
     },
-    publications_score_config: { W_publications_score: 0.05 },
+    publications_score_config: { W_publications_score: 0.1 },
   });
   const availableLLMs = [
     "gemini-2.0-flash",
