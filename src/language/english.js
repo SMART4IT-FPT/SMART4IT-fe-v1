@@ -179,7 +179,7 @@ const english = {
     resubmitBtn: "Submit another CV",
     viewActionTooltip: "View Detail",
     deleteCVSuccessMessage: "Your CV has been deleted successfully",
-    tableLabel: "Labels",
+    tableLabel: "Labels (by Longformer)",
     tableComponentScore: "Components Score",
     tableOverallScore: "Overall Score",
     educationScore: "Education Score",

@@ -371,7 +371,7 @@ export default function CVDetailPage() {
                 <Text c="violet" fw={700} ta="center">
                   Overall
                   <br />
-                  {overallScore.toFixed(1)}
+                  {overallScore}
                 </Text>
               </Center>
             }

@@ -681,7 +681,7 @@ export default function CVPage() {
                       padding: '5px'
                     }}
                   >
-                    {isNaN(overallScore) || overallScore === 0 ? "0" : overallScore.toFixed(1)}
+                    {isNaN(overallScore) || overallScore === 0 ? "0" : overallScore.toFixed(2)}
                   </Badge>
                 </Flex>
               ),
